@@ -5,17 +5,16 @@
 #ifndef TWIN_WIDTH_GRAPH_H
 #define TWIN_WIDTH_GRAPH_H
 
-class Node;
-
 #include <list>
+#include <vector>
+
+using namespace std;
 
 class Graph {
-private:
-    int numVertices;
-    std::list<Node*> adjLists;
+    vector<list<unsigned int>*> adjLists;
 public:
     explicit Graph(int V);
-    void addEdge(int src, int dest);
+    void addEdge(int s, int d);
     void print();
 };
 

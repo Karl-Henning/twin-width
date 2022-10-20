@@ -1,8 +1,6 @@
-#include <iostream>
-#include <list>
-
-#include "node.h"
 #include "graph.h"
+
+using namespace std;
 
 int main() {
     Graph graph(4);

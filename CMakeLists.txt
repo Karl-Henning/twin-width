@@ -3,4 +3,4 @@ project(twin_width)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(twin_width main.cpp node.h node.cpp graph.cpp graph.h)
+add_executable(twin_width main.cpp graph.cpp graph.h)
