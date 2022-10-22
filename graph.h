@@ -11,11 +11,12 @@
 using namespace std;
 
 class Graph {
-    vector<list<unsigned int>*> adjLists;
+    vector<list<int>*> adjLists;
 public:
-    explicit Graph(int V);
-    void addEdge(int s, int d);
+    explicit Graph(unsigned int V);
+    void addEdge(unsigned int s, unsigned int d);
     void print();
+    void mergeVertices(unsigned int v1, unsigned int v2);
 };
 
 #endif //TWIN_WIDTH_GRAPH_H
