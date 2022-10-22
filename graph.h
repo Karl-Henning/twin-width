@@ -11,13 +11,20 @@
 using namespace std;
 
 class Graph {
+private:
     unsigned int vertecies;
+    unsigned int maxDegreeColoredEdges;
     vector<list<int>*> adjLists;
+    unsigned int getDCEOfVertex(unsigned int node);
 public:
-    explicit Graph(unsigned int V);
+    Graph(unsigned int V);
+    Graph(const Graph& original);
+    ~Graph();
     void addEdge(unsigned int s, unsigned int d);
     void print();
-    void mergeVertices(unsigned int v1, unsigned int v2);
+    unsigned int mergeVertices(unsigned int v1, unsigned int v2);
+    unsigned int getMDCE();
+    vector<list<int>*> getAdjLists();
 };
 
 #endif //TWIN_WIDTH_GRAPH_H

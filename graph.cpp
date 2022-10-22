@@ -11,8 +11,9 @@ Graph::Graph(unsigned int V) {
         exit(EXIT_FAILURE);
     }
     vertecies = V;
-    adjLists = vector<list<int>*>(V);
-    for (unsigned int i = 0; i < V; i++) {
+    maxDegreeColoredEdges = 0;
+    adjLists = vector<list<int>*>(vertecies);
+    for (unsigned int i = 0; i < vertecies; i++) {
         adjLists[i] = new list<int>;
     }
 }
@@ -40,9 +41,10 @@ void Graph::print() {
             cout << "--- does not exist ---";
         }
     }
+    cout << endl;
 }
 
-void Graph::mergeVertices(unsigned int adjList1, unsigned int adjList2) {
+unsigned int Graph::mergeVertices(unsigned int adjList1, unsigned int adjList2) {
     if (adjList1 > vertecies || adjList2 > vertecies ){
         cout << "ERROR: Index out of range! Method: Graph::mergeVertices" << endl;
         exit(EXIT_FAILURE);
@@ -68,6 +70,7 @@ void Graph::mergeVertices(unsigned int adjList1, unsigned int adjList2) {
         delete adjLists[adjList1-1];
         adjLists[adjList1-1] = nullptr;
         // done with result in 2
+        return adjList2;
     } else {
         if(!adjLists[adjList2-1]->empty()){
             // merge 2 into 1
@@ -90,7 +93,7 @@ void Graph::mergeVertices(unsigned int adjList1, unsigned int adjList2) {
                     for (auto it = adjLists[abs(*adjList1Iter)-1]->begin(); it != adjLists[abs(*adjList1Iter)-1]->end(); ++it) {
                         // remove reference to L2
                         if (abs(*it) == adjList2) {
-                            it = adjLists[abs(*adjList2Iter)-1]->erase(it);
+                            it = adjLists[abs(*adjList1Iter)-1]->erase(it);
                             if(sgn || stop) break;
                             else stop = true;
                         }
@@ -187,9 +190,55 @@ void Graph::mergeVertices(unsigned int adjList1, unsigned int adjList2) {
                     }
                 }
             }
+            unsigned int degree = getDCEOfVertex(adjList1);
+            if (degree > maxDegreeColoredEdges)
+
+                maxDegreeColoredEdges = degree;
+            for (auto it = adjLists[adjList1-1]->begin(); it != adjLists[adjList1-1]->end(); ++it) {
+                degree = getDCEOfVertex(abs(*it));
+                if (degree > maxDegreeColoredEdges)
+                    maxDegreeColoredEdges = degree;
+            }
         }
         delete adjLists[adjList2-1];
         adjLists[adjList2-1] = nullptr;
         // done with result in 1
+        return adjList1;
     }
+}
+
+unsigned int Graph::getDCEOfVertex(unsigned int node) {
+    unsigned int degree = 0;
+    for (auto it = adjLists[node-1]->begin(); it != adjLists[node-1]->end(); ++it) {
+        if (*it < 0) {
+            degree += 1;
+        }
+    }
+    return degree;
+}
+
+unsigned int Graph::getMDCE() {
+    return maxDegreeColoredEdges;
+}
+
+Graph::~Graph() {
+    for (unsigned int i = 0; i < vertecies; i++) {
+        delete adjLists[i];
+    }
+}
+
+Graph::Graph(const Graph &original) {
+    vertecies = original.vertecies;
+    maxDegreeColoredEdges = original.maxDegreeColoredEdges;
+    adjLists = vector<list<int>*>(vertecies);
+    for (unsigned int i = 0; i < vertecies; i++) {
+        if (original.adjLists[i] == NULL)
+            adjLists[i] = NULL;
+        else
+            adjLists[i] = new list<int>(*original.adjLists[i]);
+    }
+}
+
+vector<list<int> *> Graph::getAdjLists() {
+    return adjLists;
 }
