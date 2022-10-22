@@ -6,6 +6,11 @@
 #include <iostream>
 
 Graph::Graph(unsigned int V) {
+    if (V > INT_MAX){
+        cout << "ERROR: Too many Vertecies! Method: Graph::Graph" << endl;
+        exit(EXIT_FAILURE);
+    }
+    vertecies = V;
     adjLists = vector<list<int>*>(V);
     for (unsigned int i = 0; i < V; i++) {
         adjLists[i] = new list<int>;
@@ -13,6 +18,10 @@ Graph::Graph(unsigned int V) {
 }
 
 void Graph::addEdge(unsigned int s, unsigned int d) {
+    if (s > vertecies || d > vertecies ){
+        cout << "ERROR: Index out of range! Method: Graph::addEdge" << endl;
+        exit(EXIT_FAILURE);
+    }
     // undirected graph
     // insert in a sorted list
     // TODO: check for unique value when entering an edge twice
@@ -34,6 +43,11 @@ void Graph::print() {
 }
 
 void Graph::mergeVertices(unsigned int adjList1, unsigned int adjList2) {
+    if (adjList1 > vertecies || adjList2 > vertecies ){
+        cout << "ERROR: Index out of range! Method: Graph::mergeVertices" << endl;
+        exit(EXIT_FAILURE);
+    }
+
     // remove self references
     for(auto it = adjLists[adjList1-1]->begin(); it != adjLists[adjList1-1]->end(); ++it) {
         if (abs(*it) == adjList2) {

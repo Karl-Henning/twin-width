@@ -11,6 +11,7 @@
 using namespace std;
 
 class Graph {
+    unsigned int vertecies;
     vector<list<int>*> adjLists;
 public:
     explicit Graph(unsigned int V);
