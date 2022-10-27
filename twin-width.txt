@@ -1,0 +1,13 @@
+Twin-width
+The twin-width of a graph is an indicator for its complexity and studies how efficient different algorithms will perform. 
+Basically it's a non-negative integer measuring a graphs distance to being a Cograph.
+A Cograph is described by the following properties:
+1. K1 is a Cograph.
+2. If G is a Cograph the complement of G is also a Cograph.
+3. If G and U are Cographs thier disjoint union is also a Cograph.
+This implies that you can find two twins in every Cograph, that you can contract together and iterate the process until you have only a singleton left.
+Now the idea is that a graph has bounded twin-width if we can contract it to a singleton by contracting near-twins together
+(two vertices whose neighborhoods differ only on a bounded number of elements). We actually track the errors and call the edges we need to add "red edges".
+A grpah has now twin-width d if we can bound the degree in red edges by the treshhold d. Because Cographs don't produce errors they always have twin-width 0.
+
+(Add grapic example)
