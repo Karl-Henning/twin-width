@@ -28,47 +28,68 @@ unsigned int max(unsigned int a, unsigned int b)
 
 unsigned int mergeVertice(int a, int b, int edges[x][x])
 {
+    //TODO: function that reduces the size of the matrix by 1 
 
-    //TODO: programm to merge a vertice 
     return edges;
 }
 
+//TODO: need a function that reduces the size of the matrix by 1 
+
+
 unsigned int rededges(int edges [a][a])
 {
-    int red = 0;
+    unsigned int red = 0;
+    unsigned int redmax = 0;
     for(int i = 0; i <= a; i++)
     {
         for(int j = 0; j <=a; j++)
         {
-            if(edges [i][j] == -1)//TODO: decide for a number that represents a red edge maybe go for a >= or <= so that a edge can be more red 
+            if(edges [i][j] == -1)
             {
                 red++;        
-            } 
+            }
+            if(edges [j][i]== -1)
+            {
+                red++;
+            }
+         
         }
+        redmax = max(redmax,red);
+        red=0;
     }
-    return red;
+    return redmax;
 }
 
-unsigned int mergeVertices(unsigned int iteration, int vertice unsigned int verticesnr  )
+unsigned int mergeVertices(unsigned int iteration, int vertice unsigned int verticesnr, unsigned int maxiter  )//TODO: check how to optimize the the number of vriables passed 
 // iteration must be initialized with 1
 {
-    if(itteration == 7) //TODO: verticesnr set maximum of itterations
+    unsigned int maxred = inf;
+    unsigned int j = (verticesnr-1)*(verticesnr)/2
+    unsigned int mincolorvec [j];
+    int i=0;
+   
+
+    //abbruchbedingung der Rekursion
+    if(itteration == maxiter) 
     {
         return 0;
     }
-   unsigned mincolorvec [(verticesnr-1)*(verticesnr)/2];
-   i=0;
-   
-   for(a=iteration; a <= n-1; a++)
+
+
+   for(int a=iteration; a <= n-1; a++)
    {
-        for(b=a+1; a <= n ; b++)
+        for(int b=a+1; a <= n ; b++)
             {
-                i++;
+                // reduce matrix and calculate the max twin width by recursion
                 int temp [verticesnr][verticesnr] = mergeVertice(a,b,edges);
-                mincolorvec[i]=rededges(temp) + mergeVertices(iteration+1, temp, verticesnr-1); // TODO: the understanding how twin width is calculated needs to checked (red edges from 1 vertice no +)
+                mincolorvec[i] =max(rededges(temp), mergeVertices(iteration+1, temp, verticesnr-1); //TODO: welche matrix muss übergeben werden 
+                i++;
             }
    }
-    
+   for(int k = 0; k << j ; k++)
+   {
+        maxred = min(mincolorvec[k],maxred);
+   }
 
-    return 0; // TODO: return min(mincolorvec) (might be easy with right twin width calculation)
+    return maxred; 
 }
