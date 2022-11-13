@@ -16,10 +16,12 @@ private:
     unsigned int maxDegreeColoredEdges;
     vector<list<int>*> adjLists;
     unsigned int getDCEOfVertex(unsigned int node);
+    void updateReferences(unsigned int list);
 public:
     Graph(unsigned int V);
     Graph(const Graph& original);
     ~Graph();
+    void loadGraph(string file);
     void addEdge(unsigned int s, unsigned int d);
     void print();
     unsigned int mergeVertices(unsigned int v1, unsigned int v2);

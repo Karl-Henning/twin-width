@@ -67,6 +67,7 @@ unsigned int Graph::mergeVertices(unsigned int adjList1, unsigned int adjList2) 
     // merge both lists
     // check if empty
     if(adjLists[adjList1-1]->empty()) {
+        updateReferences(adjList2);
         delete adjLists[adjList1-1];
         adjLists[adjList1-1] = nullptr;
         // done with result in 2
@@ -192,18 +193,43 @@ unsigned int Graph::mergeVertices(unsigned int adjList1, unsigned int adjList2) 
             }
             unsigned int degree = getDCEOfVertex(adjList1);
             if (degree > maxDegreeColoredEdges)
-
                 maxDegreeColoredEdges = degree;
             for (auto it = adjLists[adjList1-1]->begin(); it != adjLists[adjList1-1]->end(); ++it) {
                 degree = getDCEOfVertex(abs(*it));
                 if (degree > maxDegreeColoredEdges)
                     maxDegreeColoredEdges = degree;
             }
-        }
+        } else
+            updateReferences(adjList1);
         delete adjLists[adjList2-1];
         adjLists[adjList2-1] = nullptr;
         // done with result in 1
         return adjList1;
+    }
+}
+
+void Graph::updateReferences(unsigned int adjList1) {
+    for (auto adjList1Iter = adjLists[adjList1-1]->begin(); adjList1Iter != adjLists[adjList1-1]->end(); adjList1Iter++){
+        // only in L1
+        if (*adjList1Iter > 0)
+            *adjList1Iter *= -1;
+        // keep reference but set flag
+        for (auto it = adjLists[abs(*adjList1Iter)-1]->begin(); it != adjLists[abs(*adjList1Iter)-1]->end(); ++it) {
+            // update reference to L1 if sgn
+            if (abs(*it) == adjList1 && *it > 0) {
+                *it *= -1;
+            }
+        }
+    }
+
+    // update maxDegreeColoredEdges
+    unsigned int degree = getDCEOfVertex(adjList1);
+    if (degree > maxDegreeColoredEdges)
+        maxDegreeColoredEdges = degree;
+    for (auto it = adjLists[adjList1-1]->begin(); it != adjLists[adjList1-1]->end(); ++it) {
+        degree = getDCEOfVertex(abs(*it));
+        if (degree > maxDegreeColoredEdges)
+            maxDegreeColoredEdges = degree;
     }
 }
 
@@ -241,4 +267,8 @@ Graph::Graph(const Graph &original) {
 
 vector<list<int> *> Graph::getAdjLists() {
     return adjLists;
+}
+
+unsigned int Graph::getVertecies() {
+    return vertecies;
 }
