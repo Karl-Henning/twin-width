@@ -26,14 +26,129 @@ unsigned int max(unsigned int a, unsigned int b)
 }
 
 
-unsigned int mergeVertice(int a, int b, int edges[x][x])
+unsigned int mergeVertice(int a, int b, int edges[x][x], unsigned int matrixsize)
 {
+
+    // a and b should range from 0 to matrix size
     //TODO: function that reduces the size of the matrix by 1 
+        for(int i = 0; i < matrixsize; i++)
+    {
+        if(i < a)
+        {
+            if(i < b)
+            {
+                if(edges[i][a]==1)
+                {
+                    if(edges[i][b]!=1)
+                    {
+                        edges[i][a]=-1
+                    }
+                }
+                if(edges[i][a]==0)
+                {
+                    if(edges[i][b]!=0)
+                    {
+                        edges[i][a]= -1;
+                    }
+                }
+            }
+            if(i > b)
+            {
+                if(edges[i][a]==1)
+                {
+                    if(edges[b][i]!=1)
+                    {
+                        edges[i][a]=-1
+                    }
+                }
+                if(edges[i][a]==0)
+                {
+                    if(edges[b][i]!=0)
+                    {
+                        edges[i][a]= -1;
+                    }
+                }
+            }  
+        }
+        if(i > a)
+        {
+            if(i > b)
+            {
+                if(edges[a][i]==1)
+                {
+                    if(edges[b][i]!=1)
+                    {
+                        edges[a][i]=-1
+                    }
+                }
+                if(edges[a][i]==0)
+                {
+                    if(edges[b][i]!=0)
+                    {
+                        edges[a][i]= -1;
+                    }
+                }
+                /*
+                if(edges[a][i]==-1)
+                {
+                // nothing changes
+                }
+                */
+            }
+            if(i < b)
+            {
+                if(edges[a][i]==1)
+                {
+                    if(edges[i][b]!=1)
+                    {
+                        edges[a][i]=-1
+                    }
+                }
+                if(edges[a][i]==0)
+                {
+                    if(edges[i][b]!=0)
+                    {
+                        edges[a][i]= -1;
+                    }
+                }
+            }
+        }
+    }
+    int newedges[matrixsize-1][matrixsize-1]=0;
+    for(int c = 0; c < matrixsize; c++ )
+    {
+        for(int d = c; d < matrixsize; d++ )
+        {
+            if(c == b || d== b )
+            {
 
-    return edges;
+            }
+            elseif(c > b )
+            {
+                if(d > b)
+                {
+                    edges[c][d]=newedges[c-1][d-1];
+                }
+                else
+                {
+                    edges[c][d]=newedges[c-1][d];
+                }
+            }
+            else
+            {
+                if(d > b)
+                {
+                    edges[c][d]=newedges[c][d-1];
+                }
+                else
+                {
+                    edges[c][d]=newedges[c][d];
+                }
+            }
+        }
+    }
+    return newedges;
 }
-
-//TODO: need a function that reduces the size of the matrix by 1 
 
 
 unsigned int rededges(int edges [a][a])
@@ -66,6 +181,7 @@ unsigned int mergeVertices(unsigned int iteration, int vertice unsigned int vert
     unsigned int maxred = inf;
     unsigned int j = (verticesnr-1)*(verticesnr)/2
     unsigned int mincolorvec [j];
+    //unsigned int matrixsize; should be initialized
     int i=0;
    
 
@@ -76,7 +192,7 @@ unsigned int mergeVertices(unsigned int iteration, int vertice unsigned int vert
     }
 
 
-   for(int a=iteration; a <= n-1; a++)
+   for(int a=iteration; a <= n-1; a++) // here is a mistake
    {
         for(int b=a+1; a <= n ; b++)
             {
@@ -86,7 +202,7 @@ unsigned int mergeVertices(unsigned int iteration, int vertice unsigned int vert
                 i++;
             }
    }
-   for(int k = 0; k << j ; k++)
+   for(int k = 0; k < j ; k++)
    {
         maxred = min(mincolorvec[k],maxred);
    }
