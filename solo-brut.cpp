@@ -1,9 +1,9 @@
 #include <vector>
-
-unsigned int verticesnr;
-int edges [vertices][vertices];
+/* this is how a graph should be represented
+int verticesnr;
+int edges [verticesnr][verticesnr];
 unsigned int vertices [verticesnr];
-
+*/
 
 unsigned int min(unsigned int a, unsigned int b)
 {
@@ -28,11 +28,12 @@ unsigned int max(unsigned int a, unsigned int b)
 }
 
 
-unsigned int mergeVertice(int a, int b, int edges[][], unsigned int verticesnr)
+unsigned int mergeVertice(int a, int b, unsigned int verticesnr, int edges [verticesnr][verticesnr])
 {
 
     // a and b should range from 0 to matrix size -1
-    //TODO: function that reduces the size of the matrix by 1 
+    //TODO: function that reduces the size of the matrix by 1
+    int matrixsize = verticesnr-1; 
         for(unsigned int i = 0; i < verticesnr; i++)
     {
         if(i < a)
@@ -43,7 +44,7 @@ unsigned int mergeVertice(int a, int b, int edges[][], unsigned int verticesnr)
                 {
                     if(edges[i][b]!=1)
                     {
-                        edges[i][a]=-1
+                        edges[i][a]=-1;
                     }
                 }
                 if(edges[i][a]==0)
@@ -60,7 +61,7 @@ unsigned int mergeVertice(int a, int b, int edges[][], unsigned int verticesnr)
                 {
                     if(edges[b][i]!=1)
                     {
-                        edges[i][a]=-1
+                        edges[i][a]=-1;
                     }
                 }
                 if(edges[i][a]==0)
@@ -80,7 +81,7 @@ unsigned int mergeVertice(int a, int b, int edges[][], unsigned int verticesnr)
                 {
                     if(edges[b][i]!=1)
                     {
-                        edges[a][i]=-1
+                        edges[a][i]=-1;
                     }
                 }
                 if(edges[a][i]==0)
@@ -103,7 +104,7 @@ unsigned int mergeVertice(int a, int b, int edges[][], unsigned int verticesnr)
                 {
                     if(edges[i][b]!=1)
                     {
-                        edges[a][i]=-1
+                        edges[a][i]=-1;
                     }
                 }
                 if(edges[a][i]==0)
@@ -116,18 +117,24 @@ unsigned int mergeVertice(int a, int b, int edges[][], unsigned int verticesnr)
             }
         }
     }
-
-    int newedges[matrixsize-1][matrixsize-1]=0;
-
-    for(int c = 0; c < matrixsize; c++ )
+    if(matrixsize >= 1)
     {
-        for(int d = c; d < matrixsize; d++ )
+        int newedges [matrixsize][matrixsize] = 0;
+    }
+    else
+    {
+        return 0;
+    }
+    
+    for(int c = 0; c < matrixsize+1; c++ )
+    {
+        for(int d = c; d < matrixsize+1; d++ )
         {
             if(c == b || d== b )
             {
 
             }
-            elseif(c > b )
+            else if(c > b)
             {
                 if(d > b)
                 {
@@ -179,26 +186,26 @@ unsigned int rededges(int edges [][], int verticesnr)
     return redmax;
 }
 
-unsigned int mergeVertices(int edges[][], unsigned int iteration, int vertice, unsigned int verticesnr, unsigned int maxiter  )//TODO: check how to optimize the the number of vriables passed 
+unsigned int mergeVertices(int edges[][], unsigned int iteration, int vertice, unsigned int verticesnr, unsigned int maxiter)//TODO: check how to optimize the the number of vriables passed 
 // iteration must be initialized with 1
 {
-    unsigned int maxred = inf;
-    unsigned int j = (verticesnr-1)*(verticesnr)/2
+    unsigned int maxred = 999;
+    unsigned int j = (verticesnr-1)*(verticesnr)/2;
     unsigned int mincolorvec [j];
     //unsigned int matrixsize; should be initialized
     int i=0;
    
 
     //abbruchbedingung der Rekursion
-    if(itteration == maxiter) 
+    if(iteration == maxiter) 
     {
         return 0;
     }
 
 
-   for(int a=iteration; a <= n-1; a++) // here is a mistake
+   for(int a=0; a <= verticesnr-1; a++) // here is a mistake
    {
-        for(int b=a+1; a <= n ; b++)
+        for(int b=1; a <= verticesnr-1; b++)
             {
                 // reduce matrix and calculate the max twin width by recursion
                 int temp [verticesnr][verticesnr] = mergeVertice(a,b,edges);
