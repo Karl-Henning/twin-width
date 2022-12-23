@@ -4,6 +4,7 @@
 
 #include "graph.h"
 #include <iostream>
+#include <fstream>
 
 Graph::Graph(unsigned int V) {
     if (V > INT_MAX){
@@ -11,11 +12,12 @@ Graph::Graph(unsigned int V) {
         exit(EXIT_FAILURE);
     }
     vertecies = V;
-    maxDegreeColoredEdges = 0;
+    maxRedDeg = 0;
     adjLists = vector<list<int>*>(vertecies);
     for (unsigned int i = 0; i < vertecies; i++) {
         adjLists[i] = new list<int>;
     }
+    redDeg = vector<unsigned int>(vertecies, 0);
 }
 
 void Graph::addEdge(unsigned int s, unsigned int d) {
@@ -44,6 +46,32 @@ void Graph::print() {
     cout << endl;
 }
 
+void Graph::printSlim() {
+    cout << "[";
+    bool first1= true;
+    for (unsigned int d = 0; d < adjLists.size(); ++d) {
+        if (first1) {
+            cout << "[";;
+            first1 = false;
+        } else
+            cout << ", [";
+
+        if (adjLists[d] != NULL){
+            bool first2= true;
+            for (auto it = adjLists[d]->begin(); it != adjLists[d]->end(); ++it) {
+                if (first2) {
+                    cout << *it;
+                    first2 = false;
+                } else
+                    cout << ", " << *it;
+            }
+        } else
+            cout << 0;
+        cout << "]";
+    }
+    cout << "], ";
+}
+
 unsigned int Graph::mergeVertices(unsigned int adjList1, unsigned int adjList2) {
     if (adjList1 > vertecies || adjList2 > vertecies ){
         cout << "ERROR: Index out of range! Method: Graph::mergeVertices" << endl;
@@ -65,156 +93,91 @@ unsigned int Graph::mergeVertices(unsigned int adjList1, unsigned int adjList2) 
     }
 
     // merge both lists
-    // check if empty
-    if(adjLists[adjList1-1]->empty()) {
-        updateReferences(adjList2);
-        delete adjLists[adjList1-1];
-        adjLists[adjList1-1] = nullptr;
-        // done with result in 2
-        return adjList2;
-    } else {
-        if(!adjLists[adjList2-1]->empty()){
-            // merge 2 into 1
-            // assumption: both lists will most of the time have almost the same lengths
 
-            auto adjList1Iter = adjLists[adjList1-1]->begin();
-            auto adjList2Iter = adjLists[adjList2-1]->begin();
-            while(adjList1Iter != adjLists[adjList1-1]->end() && adjList2Iter != adjLists[adjList2-1]->end()) {
-                if (abs(*adjList1Iter) == abs(*adjList2Iter)) {
-                    // in L1 and L2
-                    bool sgn = false;
-                    if (*adjList2Iter < 0 && *adjList1Iter > 0) {
-                        *adjList1Iter *= -1;
-                        sgn = true;
-                    }
-                    adjList2Iter++;
+    // merge 2 into 1
+    // cout << "merge " << adjList2 << " into " << adjList1 << endl;
 
-                    // remove references
-                    bool stop = false;
-                    for (auto it = adjLists[abs(*adjList1Iter)-1]->begin(); it != adjLists[abs(*adjList1Iter)-1]->end(); ++it) {
-                        // remove reference to L2
-                        if (abs(*it) == adjList2) {
-                            it = adjLists[abs(*adjList1Iter)-1]->erase(it);
-                            if(sgn || stop) break;
-                            else stop = true;
-                        }
+    // assumption: both lists will most of the time have almost the same lengths
 
-                        // update reference to L1 if sgn
-                        if (abs(*it) == adjList1 && *it > 0 && sgn) {
-                            *it *= -1;
-                            if(stop) break;
-                            else stop = true;
-                        }
-                    }
-                } else if (abs(*adjList1Iter) > abs(*adjList2Iter)) {
-                    // only in L2
-                    adjList1Iter = adjLists[adjList1-1]->insert(adjList1Iter, -abs(*adjList2Iter));
-                    // remove reference to L2
-                    // set new reference to -L1
-                    bool inserted = false;
-                    bool stop = false;
-                    for (auto it = adjLists[abs(*adjList2Iter)-1]->begin(); it != adjLists[abs(*adjList2Iter)-1]->end(); ++it) {
-                        // remove reference to L2
-                        if (abs(*it) == adjList2) {
-                            it = adjLists[abs(*adjList2Iter)-1]->erase(it);
-                            if (stop) break;
-                            else stop = true;
-                        }
-                        // set new reference to -L1
-                        if (abs(*it) > adjList1 && !inserted) {
-                            it = adjLists[abs(*adjList2Iter)-1]->insert(it, -adjList1);
-                            if (stop) break;
-                            else stop = true;
-                            inserted = true;
-                        }
-                        // reference to -L1 has to be inserted at end
-                        if(!inserted && it == adjLists[abs(*adjList2Iter)-1]->end()) {
-                            adjLists[abs(*adjList2Iter)-1]->push_back(-adjList1);
-                            break;
-                        }
-                    }
-                    adjList2Iter++;
-                } else {
-                    // only in L1
-                    if (*adjList1Iter > 0)
-                        *adjList1Iter *= -1;
-                    // keep reference but set flag
-                    for (auto it = adjLists[abs(*adjList1Iter)-1]->begin(); it != adjLists[abs(*adjList1Iter)-1]->end(); ++it) {
-                        // update reference to L1 if sgn
-                        if (abs(*it) == adjList1 && *it > 0) {
-                            *it *= -1;
-                        }
-                    }
-                }
-                adjList1Iter++;
+    auto targetIt = adjLists[adjList1-1]->begin();
+    auto delIt = adjLists[adjList2-1]->begin();
+    while(targetIt != adjLists[adjList1-1]->end() && delIt != adjLists[adjList2-1]->end()) {
+        if (abs(*targetIt) == abs(*delIt)) {
+            // in L1 and L2
+            bool sgn = false;
+            if (*delIt < 0 && *targetIt > 0) {
+                *targetIt *= -1;
+                sgn = true;
             }
+            delIt++;
 
-            for (; adjList1Iter != adjLists[adjList1-1]->end(); adjList1Iter++){
-                // only in L1
-                if (*adjList1Iter > 0)
-                    *adjList1Iter *= -1;
-                // keep reference but set flag
-                for (auto it = adjLists[abs(*adjList1Iter)-1]->begin(); it != adjLists[abs(*adjList1Iter)-1]->end(); ++it) {
-                    // update reference to L1 if sgn
-                    if (abs(*it) == adjList1 && *it > 0) {
-                        *it *= -1;
-                    }
+            // remove references
+            bool stop = false;
+            for (auto it = adjLists[abs(*targetIt)-1]->begin(); it != adjLists[abs(*targetIt)-1]->end(); ++it) {
+                // remove reference to L2
+                if (abs(*it) == adjList2) {
+                    it = adjLists[abs(*targetIt)-1]->erase(it);
+                    if(sgn || stop) break;
+                    else stop = true;
+                }
+
+                // update reference to L1 if sgn
+                if (abs(*it) == adjList1 && *it > 0 && sgn) {
+                    *it *= -1;
+                    if(stop) break;
+                    else stop = true;
                 }
             }
-
-
+        } else if (abs(*targetIt) > abs(*delIt)) {
             // only in L2
-            if(!adjLists[adjList2-1]->empty()) {
-                for(; adjList2Iter != adjLists[adjList2-1]->end(); ++adjList2Iter) {
-                    adjLists[adjList1-1]->push_back(-abs(*adjList2Iter));
-                    bool inserted = false;
-                    bool stop = false;
-                    for (auto it = adjLists[abs(*adjList2Iter)-1]->begin(); it != adjLists[abs(*adjList2Iter)-1]->end(); ++it) {
-                        // remove reference to L2
-                        if (abs(*it) == adjList2) {
-                            it = adjLists[abs(*adjList2Iter)-1]->erase(it);
-                            if (stop) break;
-                            else stop = true;
-                        }
-                        // set new reference to -L1
-                        if (abs(*it) > adjList2 && !inserted) {
-                            it = adjLists[abs(*adjList2Iter)-1]->insert(it, -adjList1);
-                            if (stop) break;
-                            else stop = true;
-                            inserted = true;
-                        }
-                        // reference to -L1 has to be inserted at end
-                        if(!inserted && it == adjLists[abs(*adjList2Iter)-1]->end()) {
-                            adjLists[abs(*adjList2Iter)-1]->push_back(-adjList1);
-                            break;
-                        }
-                    }
+            targetIt = adjLists[adjList1-1]->insert(targetIt, -abs(*delIt));
+            // remove reference to L2
+            // set new reference to -L1
+            bool inserted = false;
+            bool stop = false;
+            for (auto it = adjLists[abs(*delIt)-1]->begin(); it != adjLists[abs(*delIt)-1]->end(); ++it) {
+                // remove reference to L2
+                if (abs(*it) == adjList2) {
+                    it = adjLists[abs(*delIt)-1]->erase(it);
+                    if (stop) break;
+                    else stop = true;
+                }
+                // set new reference to -L1
+                if (abs(*it) > adjList1 && !inserted) {
+                    cout << abs(*delIt)-1 << ", " << adjLists.size() << endl;
+                    it = adjLists[abs(*delIt)-1]->insert(it, -adjList1);
+                    if (stop) break;
+                    else stop = true;
+                    inserted = true;
+                }
+                // reference to -L1 has to be inserted at end
+                if(!inserted && it == adjLists[abs(*delIt)-1]->end()) {
+                    adjLists[abs(*delIt)-1]->push_back(-adjList1);
+                    break;
                 }
             }
-            unsigned int degree = getDCEOfVertex(adjList1);
-            if (degree > maxDegreeColoredEdges)
-                maxDegreeColoredEdges = degree;
-            for (auto it = adjLists[adjList1-1]->begin(); it != adjLists[adjList1-1]->end(); ++it) {
-                degree = getDCEOfVertex(abs(*it));
-                if (degree > maxDegreeColoredEdges)
-                    maxDegreeColoredEdges = degree;
+            delIt++;
+        } else {
+            // only in L1
+            if (*targetIt > 0)
+                *targetIt *= -1;
+            // keep reference but set flag
+            for (auto it = adjLists[abs(*targetIt)-1]->begin(); it != adjLists[abs(*targetIt)-1]->end(); ++it) {
+                // update reference to L1 if sgn
+                if (abs(*it) == adjList1 && *it > 0) {
+                    *it *= -1;
+                }
             }
-        } else
-            updateReferences(adjList1);
-        delete adjLists[adjList2-1];
-        adjLists[adjList2-1] = nullptr;
-        // done with result in 1
-        return adjList1;
+        }
+        targetIt++;
     }
-}
 
-void Graph::updateReferences(unsigned int adjList1) {
-    for (auto adjList1Iter = adjLists[adjList1-1]->begin(); adjList1Iter != adjLists[adjList1-1]->end(); adjList1Iter++){
+    for (; targetIt != adjLists[adjList1-1]->end(); targetIt++){
         // only in L1
-        if (*adjList1Iter > 0)
-            *adjList1Iter *= -1;
+        if (*targetIt > 0)
+            *targetIt *= -1;
         // keep reference but set flag
-        for (auto it = adjLists[abs(*adjList1Iter)-1]->begin(); it != adjLists[abs(*adjList1Iter)-1]->end(); ++it) {
+        for (auto it = adjLists[abs(*targetIt)-1]->begin(); it != adjLists[abs(*targetIt)-1]->end(); ++it) {
             // update reference to L1 if sgn
             if (abs(*it) == adjList1 && *it > 0) {
                 *it *= -1;
@@ -222,15 +185,50 @@ void Graph::updateReferences(unsigned int adjList1) {
         }
     }
 
-    // update maxDegreeColoredEdges
+    // only in L2
+    if(!adjLists[adjList2-1]->empty()) {
+        for(; delIt != adjLists[adjList2-1]->end(); ++delIt) {
+            adjLists[adjList1-1]->push_back(-abs(*delIt));
+            bool inserted = false;
+            bool stop = false;
+            for (auto it = adjLists[abs(*delIt)-1]->begin(); it != adjLists[abs(*delIt)-1]->end(); ++it) {
+                // remove reference to L2
+                if (abs(*it) == adjList2) {
+                    it = adjLists[abs(*delIt)-1]->erase(it);
+                    if (stop) break;
+                    else stop = true;
+                }
+                // set new reference to -L1
+                if (abs(*it) > adjList2 && !inserted) {
+                    it = adjLists[abs(*delIt)-1]->insert(it, -adjList1);
+                    if (stop) break;
+                    else stop = true;
+                    inserted = true;
+                }
+                // reference to -L1 has to be inserted at end
+                if(!inserted && it == adjLists[abs(*delIt)-1]->end()) {
+                    adjLists[abs(*delIt)-1]->push_back(-adjList1);
+                    break;
+                }
+            }
+        }
+    }
     unsigned int degree = getDCEOfVertex(adjList1);
-    if (degree > maxDegreeColoredEdges)
-        maxDegreeColoredEdges = degree;
+    redDeg[adjList1-1] = degree;
+    if (degree > maxRedDeg)
+        maxRedDeg = degree;
     for (auto it = adjLists[adjList1-1]->begin(); it != adjLists[adjList1-1]->end(); ++it) {
         degree = getDCEOfVertex(abs(*it));
-        if (degree > maxDegreeColoredEdges)
-            maxDegreeColoredEdges = degree;
+        redDeg[abs(*it)-1] = degree;
+        if (degree > maxRedDeg)
+            maxRedDeg = degree;
     }
+
+    delete adjLists[adjList2-1];
+    adjLists[adjList2-1] = nullptr;
+
+    // done with result in 1
+    return adjList1;
 }
 
 unsigned int Graph::getDCEOfVertex(unsigned int node) {
@@ -244,7 +242,7 @@ unsigned int Graph::getDCEOfVertex(unsigned int node) {
 }
 
 unsigned int Graph::getMDCE() {
-    return maxDegreeColoredEdges;
+    return maxRedDeg;
 }
 
 Graph::~Graph() {
@@ -255,7 +253,7 @@ Graph::~Graph() {
 
 Graph::Graph(const Graph &original) {
     vertecies = original.vertecies;
-    maxDegreeColoredEdges = original.maxDegreeColoredEdges;
+    maxRedDeg = original.maxRedDeg;
     adjLists = vector<list<int>*>(vertecies);
     for (unsigned int i = 0; i < vertecies; i++) {
         if (original.adjLists[i] == NULL)
@@ -263,6 +261,7 @@ Graph::Graph(const Graph &original) {
         else
             adjLists[i] = new list<int>(*original.adjLists[i]);
     }
+    redDeg = original.redDeg;
 }
 
 vector<list<int> *> Graph::getAdjLists() {
@@ -271,4 +270,213 @@ vector<list<int> *> Graph::getAdjLists() {
 
 unsigned int Graph::getVertecies() {
     return vertecies;
+}
+
+unsigned int Graph::theoreticalMergeVertices(unsigned int adjList1, unsigned int adjList2) {
+    if (adjList1 > vertecies || adjList2 > vertecies ){
+        cout << "ERROR: Index out of range! Method: Graph::theoreticalMergeVertices" << endl;
+        cout << "adjList1: " << adjList1 << " adjList2: " << adjList2 << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    unsigned int target = adjList1;
+    unsigned int del = adjList2;
+    unsigned int targetCounter = redDeg[target-1];
+    unsigned int maxRedDegTemp = maxRedDeg;
+
+    auto targetIt = adjLists[target-1]->begin();
+    auto delIt = adjLists[del-1]->begin();
+    while(!(targetIt == adjLists[target-1]->end() && delIt == adjLists[del-1]->end())) {
+        if (abs(*targetIt) == abs(*delIt) && targetIt != adjLists[target-1]->end() && delIt != adjLists[del-1]->end()) {
+            // in both
+            if(*targetIt > 0 && *delIt < 0) {
+                targetCounter++;
+            }
+            delIt++;
+            targetIt++;
+        } else if (abs(*targetIt) > abs(*delIt) && delIt != adjLists[del-1]->end() || targetIt == adjLists[target-1]->end()) {
+            // only in del
+            if (abs(*delIt) != target) {
+                if (*delIt > 0) {
+                    // del is positive
+                    if (maxRedDegTemp < redDeg[abs(*delIt) - 1]+1)
+                        maxRedDegTemp++;
+                }
+                targetCounter++;
+            }
+            delIt++;
+        } else {
+            // only in target
+            if (*targetIt > 0 && abs(*targetIt) != del) {
+                // target is positive and != del
+                targetCounter++;
+                if (maxRedDegTemp < redDeg[abs(*targetIt)-1]+1)
+                    maxRedDegTemp++;
+            } else if (*targetIt < 0 && abs(*targetIt) == del) {
+                // target is negative and == del
+                targetCounter--;
+            }
+            targetIt++;
+        }
+    }
+
+    if (maxRedDegTemp < targetCounter)
+        maxRedDegTemp = targetCounter;
+
+    return maxRedDegTemp;
+}
+
+int Graph::edgeValue(const int edge) {
+    return abs(edge);
+}
+
+bool Graph::edgeIsBlack(const int edge) {
+    if(edge > 0) return true;
+    else return false;
+}
+
+bool Graph::edgeIsRed(const int edge) {
+    if(edge < 0) return true;
+    else return false;
+}
+
+void Graph::colourEdgeRed(int* edge1, int* edge2) {
+    // color edge red
+    *edge1 *= -1;
+    *edge2 *= -1;
+}
+
+int* Graph::findEdge(list<int>* list, const int destination) {
+    return &*std::find_if(list->begin(), list->end(), [&]( const int edge ){ return abs(edge) == destination; } );
+}
+
+void Graph::deleteEdge(list<int>* list, const int destination) {
+    auto it = std::find_if(list->begin(), list->end(), [&]( const int e ){ return abs(e) == destination; } );
+    list->erase(it);
+}
+
+void Graph::incrementRedDegree(int edge) {
+    int value = redDeg[abs(edge)-1];
+    redDeg[abs(edge)-1] = value+1;
+}
+
+void Graph::decrementRedDegree(int edge) {
+    redDeg[abs(edge)-1]--;
+}
+
+void Graph::insertRedEdge(int vertex1, int vertex2) {
+    vertex1 = abs(vertex1);
+    vertex2 = abs(vertex2);
+
+    auto list = adjLists[vertex1-1];
+    auto it = std::find_if(list->begin(), list->end(), [&]( const int e ){ return abs(e) > vertex2; } );
+    list->insert(it,-vertex2);
+
+    list = adjLists[vertex2-1];
+    it = std::find_if(list->begin(), list->end(), [&]( const int e ){ return abs(e) > vertex1; } );
+    list->insert(it,-vertex1);
+}
+
+unsigned int Graph::realMergeVertices(unsigned int adjList1, unsigned int adjList2) {
+    if (adjList1 > vertecies || adjList2 > vertecies ){
+        cout << "ERROR: Index out of range! Method: Graph::realMergeVertices" << endl;
+        cout << "adjList1: " << adjList1 << " adjList2: " << adjList2 << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    unsigned int target = adjList1;
+    unsigned int del = adjList2;
+
+    auto targetIt = adjLists[target-1]->begin();
+    auto delIt = adjLists[del-1]->begin();
+    while(targetIt != adjLists[target-1]->end() || delIt != adjLists[del-1]->end()) {
+        // cout << "targetIt: " << *targetIt << " delIt: " << *delIt << endl;
+
+        // check if both vertices have an edge to n
+        if (edgeValue(*targetIt) == edgeValue(*delIt) && targetIt != adjLists[target-1]->end() && delIt != adjLists[del-1]->end()) {
+            // if edge from del to n is red
+            // cout << "took 1" << endl;
+            if(edgeIsRed(*delIt)) {
+                if(edgeIsBlack(*targetIt)) {
+                    // color edge from target to n and from n to target red
+                    colourEdgeRed(&*targetIt, findEdge(adjLists[edgeValue(*targetIt)-1], target));
+
+                    // increment redDegreeCounter
+                    incrementRedDegree(target);
+                } else {
+                    decrementRedDegree(*targetIt);
+                }
+            }
+
+            // delete edge from n to del
+            deleteEdge(adjLists[edgeValue(*targetIt)-1], del);
+
+            delIt++;
+            targetIt++;
+        } else if (edgeValue(*targetIt) > edgeValue(*delIt) && delIt != adjLists[del-1]->end() || targetIt == adjLists[target-1]->end()) {
+            // only in del
+            // cout << "took 2" << endl;
+            if (abs(*delIt) != target) {
+                // insert red edge from target to n
+                insertRedEdge(target, *delIt);
+                incrementRedDegree(target);
+                if(edgeIsBlack(*delIt)) {
+                    incrementRedDegree(*delIt);
+                }
+
+                // delete edge from n to del
+                deleteEdge(adjLists[edgeValue(*delIt)-1], del);
+            }
+
+            delIt++;
+        } else {
+            // cout << "took 3" << endl;
+            // only in target
+            if(abs(*targetIt) != del) {
+                if(edgeIsBlack(*targetIt)) {
+                    // target is black and != del
+                    colourEdgeRed(&*targetIt, findEdge(adjLists[edgeValue(*targetIt)-1], target));
+
+                    // increment redDegreeCounter
+                    incrementRedDegree(target);
+                    incrementRedDegree(*targetIt);
+                }
+                targetIt++;
+            } else {
+                if(edgeIsRed(*targetIt)) {
+                    decrementRedDegree(target);
+                }
+
+                // delete edge
+                targetIt = adjLists[edgeValue(*targetIt)-1]->erase(targetIt);
+            }
+        }
+        int max = 0;
+        for (auto it = redDeg.begin(); it != redDeg.end(); ++it) {
+            if (*it > max)
+                max = *it;
+        }
+        /*
+        cout << "maximum: " << max << endl;
+        for (auto it = redDeg.begin(); it != redDeg.end(); ++it) {
+            cout << *it << ", ";
+        }
+        cout << endl;
+        print();
+         */
+    }
+
+    delete adjLists[del-1];
+    adjLists[del-1] = nullptr;
+
+
+    for (auto it = redDeg.begin(); it != redDeg.end(); ++it) {
+        if(maxRedDeg < *it) {
+            maxRedDeg = *it;
+        }
+    }
+
+    // printSlim();
+
+    return maxRedDeg;
 }
