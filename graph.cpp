@@ -540,27 +540,70 @@ tuple<int, int> Graph::getOptimalMerge(unsigned int vertex) {
 
 // TODO: doublecheck if we really need to update that much
 void Graph::updateMinMerges(vector<tuple<int, int>>* minMerges, unsigned int vertex1, list<int> delAdjList, unsigned int delVertex) {
-    (*minMerges)[vertex1-1] = getOptimalMerge(vertex1);
-    for (auto it = adjLists[vertex1-1]->begin(); it != adjLists[vertex1-1]->end(); ++it) {
-        (*minMerges)[edgeValue(*it)-1] = getOptimalMerge(edgeValue(*it));
+    // vertcies to be updated
+    unsigned int maxSize = 0;
 
+    maxSize++;
+    maxSize += adjLists[vertex1-1]->size();
+    for (auto it = adjLists[vertex1-1]->begin(); it != adjLists[vertex1-1]->end(); ++it) {
+        // second degree of vertex1
+        maxSize += adjLists[edgeValue(*it)-1]->size();
+    }
+    // first degree of delVertex
+    maxSize += delAdjList.size();
+    for (auto it = delAdjList.begin(); it != delAdjList.end(); ++it) {
+        // second degree of delVertex
+        maxSize += adjLists[edgeValue(*it)-1]->size();
+    }
+    if (maxSize > vertecies) {
+        maxSize = vertecies;
+    }
+    auto verticesToUpdate = vector<unsigned int>(maxSize);
+
+    verticesToUpdate.push_back(vertex1);
+    // first degree of vertex1
+    for (auto it = adjLists[vertex1-1]->begin(); it != adjLists[vertex1-1]->end(); ++it) {
+        if (edgeValue(*it) == delVertex) {
+            continue;
+        }
+
+        verticesToUpdate.push_back(edgeValue(*it));
+
+        // second degree of vertex1
         for (auto it2 = adjLists[edgeValue(*it)-1]->begin(); it2 != adjLists[edgeValue(*it)-1]->end(); ++it2) {
-            if (*it2 == vertex1) {
+            if (edgeValue(*it2) == vertex1 || edgeValue(*it2) == delVertex) {
                 continue;
             }
-            (*minMerges)[edgeValue(*it2)-1] = getOptimalMerge(edgeValue(*it2));
+            verticesToUpdate.push_back(edgeValue(*it2));
         }
     }
 
+    // first degree of delVertex
     for (auto it = delAdjList.begin(); it != delAdjList.end(); ++it) {
-        (*minMerges)[edgeValue(*it)-1] = getOptimalMerge(edgeValue(*it));
+        if (edgeValue(*it) == vertex1) {
+            continue;
+        }
+        verticesToUpdate.push_back(edgeValue(*it));
 
+        // second degree of delVertex
         for (auto it2 = adjLists[edgeValue(*it)-1]->begin(); it2 != adjLists[edgeValue(*it)-1]->end(); ++it2) {
-            if (get<1>((*minMerges)[edgeValue(*it2)-1]) == delVertex) {
+            if (edgeValue(*it2) == vertex1 || edgeValue(*it2) == delVertex) {
                 continue;
             }
-            (*minMerges)[edgeValue(*it2)-1] = getOptimalMerge(edgeValue(*it2));
+            verticesToUpdate.push_back(edgeValue(*it2));
         }
+    }
+
+    // sort and remove duplicates
+    sort(verticesToUpdate.begin(), verticesToUpdate.end());
+    verticesToUpdate.erase(unique(verticesToUpdate.begin(), verticesToUpdate.end()), verticesToUpdate.end());
+
+    // update minMerges
+    for (auto it = verticesToUpdate.begin(); it != verticesToUpdate.end(); ++it) {
+        if (*it == 0) {
+            continue;
+        }
+        (*minMerges)[*it-1] = getOptimalMerge(*it);
     }
 }
 

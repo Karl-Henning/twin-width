@@ -5,6 +5,8 @@
 using namespace std;
 #include <fstream>
 #include <chrono>
+#include <tuple>
+#include <climits>
 
 Graph* loadGraph(string fileName) {
     // Create a text string, which is used to output the text file
@@ -55,10 +57,11 @@ unsigned int greedy(Graph* graph) {
             }
         }
 
-        // graph->printSlim();
+        graph->realMergeVertices(v1, v2);
+
+        graph->printSlim();
         // cout << '"' << "merged: " << v1 << " and " << v2 << ", current max RedDeg: " << graph->getMDCE() << '"' << endl;
 
-        graph->realMergeVertices(v1, v2);
 
         minRes = min;
     }
@@ -67,6 +70,8 @@ unsigned int greedy(Graph* graph) {
 
 unsigned int newAlgo(Graph* graph) {
     // algorithm 1.0
+
+    // graph->printSlim();
 
     // store most optimal Merge for each vertex in array (redDeg after merge, merged with vertex)
     auto minMerges = vector<tuple<int, int>>(graph->getVertecies());
@@ -79,7 +84,9 @@ unsigned int newAlgo(Graph* graph) {
         // get optimal merge (redDeg after merge, target, del)
         tuple<int, int, int> optimalMerge = make_tuple(INT_MAX, 0, 0);
         for (unsigned int vertex2 = 1; vertex2 < graph->getVertecies(); vertex2++) {
-            if (graph->getAdjLists()[vertex2-1] == NULL) continue;
+            if (graph->getAdjLists()[vertex2-1] == nullptr) {
+                continue;
+            }
 
             auto merge = minMerges[vertex2-1];
 
@@ -90,7 +97,7 @@ unsigned int newAlgo(Graph* graph) {
             }
 
             if (get<0>(merge) < get<0>(optimalMerge)) {
-                optimalMerge = make_tuple(get<0>(merge), get<1>(merge), vertex2);
+                optimalMerge = make_tuple(get<0>(merge), vertex2, get<1>(merge));
             }
             if (get<0>(optimalMerge) == 0) {
                 break;
@@ -103,11 +110,16 @@ unsigned int newAlgo(Graph* graph) {
 
         auto delAdjList = *graph->getAdjLists()[get<2>(optimalMerge)-1];
 
+        // perform merge
+        int twinWidth1 = graph->theoreticalMergeVertices(get<1>(optimalMerge), get<2>(optimalMerge));
+        int twinWidth2 = graph->realMergeVertices(get<1>(optimalMerge), get<2>(optimalMerge));
+        if (twinWidth1 != twinWidth2) {
+            cout << "ERROR: twinWidth1 != twinWidth2" << endl;
+        }
+
         // graph->printSlim();
         // cout << '"' << "merged: " << get<1>(optimalMerge) << " and " << get<2>(optimalMerge) << ", current max RedDeg: " << graph->getMDCE() << '"' << endl;
 
-        // perform merge
-        graph->realMergeVertices(get<1>(optimalMerge), get<2>(optimalMerge));
         minMerges[get<2>(optimalMerge)-1] = make_tuple(INT_MAX, 0);
 
         // update target and it's neighbours
@@ -142,12 +154,16 @@ double measure(string fileName, unsigned int algo(Graph*)) {
 
 void predefinedMerges(string fileName) {
     Graph* graph = loadGraph(fileName);
-    vector<vector<int>> merges = {{7, 1}, {9, 3}, {10, 4}, {10, 5}, {21, 17}, {25, 24}, {25, 20}, {23, 19}, {22, 18}, {25, 23}, {21, 16}, {15, 10}, {15, 14}, {8, 2}, {25, 22}, {15, 9}, {15, 13}, {25, 21}, {8, 7}, {25, 12}, {25, 15}, {25, 11}, {25, 8}, {25, 6}};
+
+    // graph->printSlim();
+
+    vector<vector<int>> merges = {{13, 12}, {21, 14}, {24, 23}, {9, 8}, {25, 19}, {21, 16}, {21, 20}, {21, 15}, {22, 7}, {25, 17}, {18, 6}, {22, 5}, {25, 18}, {10, 9}, {24, 3}, {11, 4}, {13, 11}, {24, 13}, {24, 10}, {25, 1}, {25, 24}, {25, 22}, {25, 2}, {25, 21}};
     for (int i = 0; i < merges.size(); i++) {
-        // graph->printSlim();
-        // cout << endl;
+
         graph->realMergeVertices(merges[i][0], merges[i][1]);
-        // cout << '"' << "merged: " << merges[i][0] << " and " << merges[i][1] << ", current max RedDeg: " << graph->getMDCE() << '"' << endl;
+
+        // graph->printSlim();
+        cout << '"' << "merged: " << merges[i][0] << " and " << merges[i][1] << ", current max RedDeg: " << graph->getMDCE() << '"' << endl;
     }
     // cout << "Twin-Width result: " << graph->getMDCE() << endl;
     delete graph;
@@ -156,8 +172,8 @@ void predefinedMerges(string fileName) {
 int main() {
     // vector<int> sol = {1, 2, 0, 0, 3, 0, 2, 4, 1, 2};
     // double average0 = 0;
-    string naming = "tiny-set/tiny"; //  "heuristic/he";
-    for(int i = 7; i < 8; i++) {
+    string naming = "heuristic/he";
+    for(int i = 1; i < 201; i++) {
         string fileName;
         if(i < 10)
             fileName = naming + "00";
