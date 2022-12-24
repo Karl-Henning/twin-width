@@ -4,7 +4,9 @@
 
 #include "graph.h"
 #include <iostream>
-#include <fstream>
+#include <algorithm>
+#include <climits>
+#include <tuple>
 
 Graph::Graph(unsigned int V) {
     if (V > INT_MAX){
@@ -358,6 +360,8 @@ void Graph::deleteEdge(list<int>* list, const int destination) {
 void Graph::incrementRedDegree(int edge) {
     int value = redDeg[abs(edge)-1];
     redDeg[abs(edge)-1] = value+1;
+
+    // TODO: could implement check for maxRedDeg here
 }
 
 void Graph::decrementRedDegree(int edge) {
@@ -390,12 +394,9 @@ unsigned int Graph::realMergeVertices(unsigned int adjList1, unsigned int adjLis
     auto targetIt = adjLists[target-1]->begin();
     auto delIt = adjLists[del-1]->begin();
     while(targetIt != adjLists[target-1]->end() || delIt != adjLists[del-1]->end()) {
-        // cout << "targetIt: " << *targetIt << " delIt: " << *delIt << endl;
-
         // check if both vertices have an edge to n
         if (edgeValue(*targetIt) == edgeValue(*delIt) && targetIt != adjLists[target-1]->end() && delIt != adjLists[del-1]->end()) {
             // if edge from del to n is red
-            // cout << "took 1" << endl;
             if(edgeIsRed(*delIt)) {
                 if(edgeIsBlack(*targetIt)) {
                     // color edge from target to n and from n to target red
@@ -415,7 +416,6 @@ unsigned int Graph::realMergeVertices(unsigned int adjList1, unsigned int adjLis
             targetIt++;
         } else if (edgeValue(*targetIt) > edgeValue(*delIt) && delIt != adjLists[del-1]->end() || targetIt == adjLists[target-1]->end()) {
             // only in del
-            // cout << "took 2" << endl;
             if (abs(*delIt) != target) {
                 // insert red edge from target to n
                 insertRedEdge(target, *delIt);
@@ -430,7 +430,6 @@ unsigned int Graph::realMergeVertices(unsigned int adjList1, unsigned int adjLis
 
             delIt++;
         } else {
-            // cout << "took 3" << endl;
             // only in target
             if(abs(*targetIt) != del) {
                 if(edgeIsBlack(*targetIt)) {
@@ -456,27 +455,116 @@ unsigned int Graph::realMergeVertices(unsigned int adjList1, unsigned int adjLis
             if (*it > max)
                 max = *it;
         }
-        /*
-        cout << "maximum: " << max << endl;
-        for (auto it = redDeg.begin(); it != redDeg.end(); ++it) {
-            cout << *it << ", ";
-        }
-        cout << endl;
-        print();
-         */
     }
 
     delete adjLists[del-1];
     adjLists[del-1] = nullptr;
 
 
-    for (auto it = redDeg.begin(); it != redDeg.end(); ++it) {
-        if(maxRedDeg < *it) {
-            maxRedDeg = *it;
+    int value = redDeg[target-1];
+    if(maxRedDeg < value) {
+        maxRedDeg = value;
+    }
+    // if implemented in incrementRedDegree this could be removed
+    for (auto it = adjLists[target-1]->begin(); it != adjLists[target-1]->end(); ++it) {
+        value = redDeg[edgeValue(*it)-1];
+        if(maxRedDeg < value) {
+            maxRedDeg = value;
         }
     }
 
-    // printSlim();
+    /*
+    // checks
+    // check for same signs / adjLists
+    for (unsigned int index = 0; index < adjLists.size(); index++) {
+        if (adjLists[index]) {
+            for (auto edgeIt = adjLists[index]->begin(); edgeIt != adjLists[index]->end(); ++edgeIt) {
+                auto it = findEdge(adjLists[edgeValue(*edgeIt) - 1], index+1);
+                if (it == nullptr || *it / abs(*it) != *edgeIt / abs(*edgeIt)) {
+                    cout << *it << ", " << *edgeIt << endl;
+                    cout << "ERROR: Not same signs!" << endl;
+                }
+            }
+        }
+    }
+    // check redDeg
+    for (unsigned int index = 0; index < adjLists.size(); index++) {
+        if (adjLists[index]) {
+            int count = 0;
+            for (auto edgeIt = adjLists[index]->begin(); edgeIt != adjLists[index]->end(); ++edgeIt) {
+                if(edgeIsRed(*edgeIt)) {
+                    count++;
+                }
+            }
+            if (redDeg[index] != count) {
+                cout << "ERROR: Wrong redDeg stored!" << endl;
+            }
+        }
+    }
+    */
 
     return maxRedDeg;
+}
+
+tuple<int, int> Graph::getOptimalMerge(unsigned int vertex) {
+    tuple<int, int> optimalMerge = make_tuple(INT_MAX, 0);
+    for (auto it = adjLists[vertex-1]->begin(); it != adjLists[vertex-1]->end(); ++it) {
+        // check first degree
+        int redDeg = theoreticalMergeVertices(vertex, edgeValue(*it));
+
+        if (redDeg == 0) {
+            return make_tuple(redDeg, edgeValue(*it));
+        } else if (redDeg < get<0>(optimalMerge)) {
+            optimalMerge = make_tuple(redDeg, edgeValue(*it));
+        }
+
+        // check second degree
+        int target = edgeValue(*it);
+        for (auto it2 = adjLists[target-1]->begin(); it2 != adjLists[target-1]->end(); ++it2) {
+            if (edgeValue(*it2) == vertex) {
+                continue;
+            }
+
+            redDeg = theoreticalMergeVertices(vertex, edgeValue(*it2));
+            if (redDeg == 0) {
+                return make_tuple(redDeg, edgeValue(*it2));
+            } else if (redDeg < get<0>(optimalMerge)) {
+                optimalMerge = make_tuple(redDeg, edgeValue(*it2));
+            }
+        }
+    }
+
+    return optimalMerge;
+}
+
+
+// TODO: doublecheck if we really need to update that much
+void Graph::updateMinMerges(vector<tuple<int, int>>* minMerges, unsigned int vertex1, list<int> delAdjList, unsigned int delVertex) {
+    (*minMerges)[vertex1-1] = getOptimalMerge(vertex1);
+    for (auto it = adjLists[vertex1-1]->begin(); it != adjLists[vertex1-1]->end(); ++it) {
+        (*minMerges)[edgeValue(*it)-1] = getOptimalMerge(edgeValue(*it));
+
+        for (auto it2 = adjLists[edgeValue(*it)-1]->begin(); it2 != adjLists[edgeValue(*it)-1]->end(); ++it2) {
+            if (*it2 == vertex1) {
+                continue;
+            }
+            (*minMerges)[edgeValue(*it2)-1] = getOptimalMerge(edgeValue(*it2));
+        }
+    }
+
+    for (auto it = delAdjList.begin(); it != delAdjList.end(); ++it) {
+        (*minMerges)[edgeValue(*it)-1] = getOptimalMerge(edgeValue(*it));
+
+        for (auto it2 = adjLists[edgeValue(*it)-1]->begin(); it2 != adjLists[edgeValue(*it)-1]->end(); ++it2) {
+            if (get<1>((*minMerges)[edgeValue(*it2)-1]) == delVertex) {
+                continue;
+            }
+            (*minMerges)[edgeValue(*it2)-1] = getOptimalMerge(edgeValue(*it2));
+        }
+    }
+}
+
+void Graph::deleteVertex(unsigned int vertex) {
+    delete adjLists[vertex-1];
+    adjLists[vertex-1] = nullptr;
 }

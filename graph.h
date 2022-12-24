@@ -39,6 +39,9 @@ public:
     unsigned int getMDCE();
     vector<list<int> *> getAdjLists();
     unsigned int getVertecies();
+    tuple<int, int> getOptimalMerge(unsigned int vertex);
+    void updateMinMerges(vector<tuple<int, int>>* minMerges, unsigned int vertex, list<int> delAdjList, unsigned int delVertex);
+    void deleteVertex(unsigned int vertex);
 };
 
 #endif //TWIN_WIDTH_GRAPH_H

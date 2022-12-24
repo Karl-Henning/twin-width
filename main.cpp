@@ -4,8 +4,7 @@
 
 using namespace std;
 #include <fstream>
-#include <sstream>
-#include "gtest/gtest.h"
+#include <chrono>
 
 Graph* loadGraph(string fileName) {
     // Create a text string, which is used to output the text file
@@ -38,36 +37,12 @@ Graph* loadGraph(string fileName) {
     return graph;
 }
 
-unsigned int greedyOld(Graph* graph) {
+unsigned int greedy(Graph* graph) {
     // greedy algorithm
     unsigned int v1, v2, minRes;
-    for(unsigned int iteration = 1; iteration <= graph->getVertecies()-1; iteration++) {
+    for(unsigned int iteration = 1; iteration < graph->getVertecies(); iteration++) {
         unsigned int min = 99999;
-        for (unsigned int outer = 1; outer <= graph->getVertecies()-1; outer++) {
-            if (graph->getAdjLists()[outer-1] == NULL) continue;
-            for (unsigned int inner = outer + 1; inner <= graph->getVertecies(); inner++) {
-                if (graph->getAdjLists()[inner-1] == NULL) continue;
-                Graph testGraph(*graph);
-                testGraph.mergeVertices(outer, inner);
-                if (testGraph.getMDCE() < min) {
-                    min = testGraph.getMDCE();
-                    v1 = outer;
-                    v2 = inner;
-                }
-            }
-        }
-        graph->mergeVertices(v1, v2);
-        minRes = min;
-    }
-    return minRes;
-}
-
-unsigned int greedyNew(Graph* graph) {
-    // greedy algorithm
-    unsigned int v1, v2, minRes;
-    for(unsigned int iteration = 1; iteration <= graph->getVertecies()-1; iteration++) {
-        unsigned int min = 99999;
-        for (unsigned int outer = 1; outer <= graph->getVertecies()-1; outer++) {
+        for (unsigned int outer = 1; outer < graph->getVertecies(); outer++) {
             if (graph->getAdjLists()[outer-1] == NULL) continue;
             for (unsigned int inner = outer + 1; inner <= graph->getVertecies(); inner++) {
                 if (graph->getAdjLists()[inner-1] == NULL) continue;
@@ -80,13 +55,65 @@ unsigned int greedyNew(Graph* graph) {
             }
         }
 
-        // cout << "Merging " << v1 << " and " << v2 << endl;
+        // graph->printSlim();
+        // cout << '"' << "merged: " << v1 << " and " << v2 << ", current max RedDeg: " << graph->getMDCE() << '"' << endl;
+
         graph->realMergeVertices(v1, v2);
-        // graph->print();
 
         minRes = min;
     }
     return minRes;
+}
+
+unsigned int newAlgo(Graph* graph) {
+    // algorithm 1.0
+
+    // store most optimal Merge for each vertex in array (redDeg after merge, merged with vertex)
+    auto minMerges = vector<tuple<int, int>>(graph->getVertecies());
+    for (unsigned int vertex1 = 1; vertex1 <= graph->getVertecies(); vertex1++) {
+        minMerges[vertex1-1] = graph->getOptimalMerge(vertex1);
+    }
+
+    // merge vertices with lowest redDeg
+    for(unsigned int iteration = 1; iteration < graph->getVertecies(); iteration++) {
+        // get optimal merge (redDeg after merge, target, del)
+        tuple<int, int, int> optimalMerge = make_tuple(INT_MAX, 0, 0);
+        for (unsigned int vertex2 = 1; vertex2 < graph->getVertecies(); vertex2++) {
+            if (graph->getAdjLists()[vertex2-1] == NULL) continue;
+
+            auto merge = minMerges[vertex2-1];
+
+            // remove vertex with empty adjLists
+            if (get<0>(merge) == INT_MAX) {
+                graph->deleteVertex(vertex2);
+                break;
+            }
+
+            if (get<0>(merge) < get<0>(optimalMerge)) {
+                optimalMerge = make_tuple(get<0>(merge), get<1>(merge), vertex2);
+            }
+            if (get<0>(optimalMerge) == 0) {
+                break;
+            }
+        }
+
+        if (get<0>(optimalMerge) == INT_MAX) {
+            continue;
+        }
+
+        auto delAdjList = *graph->getAdjLists()[get<2>(optimalMerge)-1];
+
+        // graph->printSlim();
+        // cout << '"' << "merged: " << get<1>(optimalMerge) << " and " << get<2>(optimalMerge) << ", current max RedDeg: " << graph->getMDCE() << '"' << endl;
+
+        // perform merge
+        graph->realMergeVertices(get<1>(optimalMerge), get<2>(optimalMerge));
+        minMerges[get<2>(optimalMerge)-1] = make_tuple(INT_MAX, 0);
+
+        // update target and it's neighbours
+        graph->updateMinMerges(&minMerges, get<1>(optimalMerge), delAdjList, get<2>(optimalMerge));
+    }
+    return graph->getMDCE();
 }
 
 double measure(string fileName, unsigned int algo(Graph*)) {
@@ -129,8 +156,8 @@ void predefinedMerges(string fileName) {
 int main() {
     // vector<int> sol = {1, 2, 0, 0, 3, 0, 2, 4, 1, 2};
     // double average0 = 0;
-    string naming = "heuristic/he"; // "tiny-set/tiny";
-    for(int i = 1; i < 11; i++) {
+    string naming = "tiny-set/tiny"; //  "heuristic/he";
+    for(int i = 7; i < 8; i++) {
         string fileName;
         if(i < 10)
             fileName = naming + "00";
@@ -139,7 +166,7 @@ int main() {
         else
             fileName = naming;
 
-        measure(fileName + to_string(i) + ".gr", greedyNew);
+        measure(fileName + to_string(i) + ".gr", newAlgo);
 
         // measure
         /*
