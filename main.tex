@@ -13,43 +13,56 @@
 
 \begin{document}
 
-
-
 \maketitle
 
 \section{Introduction}
 %unnötige introduction .. \\
 
-In the course of this seminar we participate in the PACE Challenge 2023. This years Challenge is about twin-width, a graph parameter that measures the distance of a graph to a co-graph. Introduced in 2020 The parameter did lead to many theoretical results but as of now its not real practical tested. So Our goal is to implement and test it to bridge the gap between theory and practice. %add reference to https://pacechallenge.org/2023/
-\\
-The twin-width algorithm is an new approach to solve graph theory problems that are commonly solved by the tree-width algorithm. The starting point of our paper will be a short summary of the algorithm. Afterwards we will introduce a way to implement it in C++.
+In the course of this seminar we participate in the PACE Challenge 2023. This years
+Challenge is about twin-width, a graph parameter that measures the distance of a graph to
+a co-graph. Introduced in 2020 The parameter did lead to many theoretical results but as
+of now its not real practical tested. So Our goal is to implement and test it to bridge
+the gap between theory and practice. \\ The twin-width algorithm is an new approach to
+solve graph theory problems that are commonly solved by the tree-width algorithm. The
+starting point of our paper will be a short summary of the algorithm. Afterwards we will
+introduce a way to implement it in C++.%add reference to https://pacechallenge.org/2023/
 %Beschreibung...
-\\
-The twin-width of a graph is an indicator for its complexity and studies how efficient different algorithms will perform.
 
-Basically it's a non-negative integer measuring a graphs distance to being a Cograph.
-A Cograph is described by the following properties:
+The twin-width of a graph is an indicator for its complexity and studies how efficient
+different algorithms will perform.
+
+Basically it's a non-negative integer measuring a graphs distance to being a Cograph. A
+Cograph is described by the following properties:
+
 \begin{enumerate}
     \item K1 is a Cograph.
     \item If G is a Cograph the complement of G is also a Cograph.
     \item If G and U are Cographs their disjoint union is also a Cograph.
 \end{enumerate}
-This implies that you can find two twins in every Cograph, that you can contract together and iterate the process until you have only a singleton left.
 
-Now the idea is that a graph has bounded twin-width if we can contract it to a singleton by contracting near-twins together
-(two vertices whose neighborhoods differ only on a bounded number of elements). We actually track the errors and call the edges we need to add "red edges".
+This implies that you can find two twins in every Cograph, that you can contract together
+and iterate the process until you have only a singleton left.
 
-A graph has now twin-width d if we can bound the degree in red edges by the treshhold d. Because Cographs don't produce errors they always have twin-width 0. \\
+Now the idea is that a graph has bounded twin-width if we can contract it to a singleton
+by contracting near-twins together (two vertices whose neighborhoods differ only on a
+bounded number of elements). We actually track the errors and call the edges we need to
+add "red edges".
+
+A graph has now twin-width d if we can bound the degree in red edges by the treshhold d.
+Because Cographs don't produce errors they always have twin-width 0. \\
 %Add grapic example
 
-graphs that can be reduced to a single vertex by a process of repeatedly finding any two twin vertices and merging them into a single vertex. The definition of twin-width mimics this reduction process.
-there are false and true twins.
+graphs that can be reduced to a single vertex by a process of repeatedly finding any two
+twin vertices and merging them into a single vertex. The definition of twin-width mimics
+this reduction process. there are false and true twins.
 
-true twins have the same set of edges A = B
- false twins have a similar set of edges the edges that differ will be marked red  {A / B  \& B/A} == red
+true twins have the same set of edges A = B false twins have a similar set of edges the
+edges that differ will be marked red {A / B \& B/A} == red
 
- the twin width is the variable that sets the maximum of red edges that appear by a reduction of a graph G. This variable can be used to upper-bound the complexity for certain algorithms from NP-Complexity to Polynomial Complexity.
- citations: \cite{bonnet2021twini} \cite{bonnet2021twinii}.
+the twin width is the variable that sets the maximum of red edges that appear by a
+reduction of a graph G. This variable can be used to upper-bound the complexity for
+certain algorithms from NP-Complexity to Polynomial Complexity. citations:
+\cite{bonnet2021twini} \cite{bonnet2021twinii}.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{bibliography}
