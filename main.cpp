@@ -123,6 +123,7 @@ unsigned int newAlgo(Graph* graph) {
         minMerges[get<2>(optimalMerge)-1] = make_tuple(INT_MAX, 0);
 
         // update target and it's neighbours
+
         graph->updateMinMerges(&minMerges, get<1>(optimalMerge), delAdjList, get<2>(optimalMerge));
     }
     return graph->getMDCE();
