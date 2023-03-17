@@ -507,30 +507,34 @@ unsigned int Graph::realMergeVertices(unsigned int adjList1, unsigned int adjLis
 }
 
 tuple<int, int> Graph::getOptimalMerge(unsigned int vertex) {
-    tuple<int, int> optimalMerge = make_tuple(INT_MAX, 0);
+    // get first and second degree neighbours
+    vector<unsigned int> allNeighbours;
     for (auto it = adjLists[vertex-1]->begin(); it != adjLists[vertex-1]->end(); ++it) {
-        // check first degree
-        int redDeg = theoreticalMergeVertices(vertex, edgeValue(*it));
+        // add all first degree neighbours
+        auto vertex = edgeValue(*it);
+        allNeighbours.push_back(vertex);
 
-        if (redDeg == 0) {
-            return make_tuple(redDeg, edgeValue(*it));
-        } else if (redDeg < get<0>(optimalMerge)) {
-            optimalMerge = make_tuple(redDeg, edgeValue(*it));
-        }
-
-        // check second degree
-        int target = edgeValue(*it);
-        for (auto it2 = adjLists[target-1]->begin(); it2 != adjLists[target-1]->end(); ++it2) {
+        // add all second degree neighbours
+        for (auto it2 = adjLists[vertex-1]->begin(); it2 != adjLists[vertex-1]->end(); ++it2) {
             if (edgeValue(*it2) == vertex) {
                 continue;
             }
-
-            redDeg = theoreticalMergeVertices(vertex, edgeValue(*it2));
-            if (redDeg == 0) {
-                return make_tuple(redDeg, edgeValue(*it2));
-            } else if (redDeg < get<0>(optimalMerge)) {
-                optimalMerge = make_tuple(redDeg, edgeValue(*it2));
+            auto vertex2 = edgeValue(*it2);
+            if (find(allNeighbours.begin(), allNeighbours.end(), vertex2) == allNeighbours.end()) {
+                allNeighbours.push_back(vertex2);
             }
+        }
+    }
+
+    // get optimal merge
+    tuple<int, int> optimalMerge = make_tuple(INT_MAX, 0);
+
+    for (auto it = allNeighbours.begin(); it != allNeighbours.end(); ++it) {
+        int redDeg = theoreticalMergeVertices(vertex, *it);
+        if (redDeg == 0) {
+            return make_tuple(redDeg, *it);
+        } else if (redDeg < get<0>(optimalMerge)) {
+            optimalMerge = make_tuple(redDeg, *it);
         }
     }
 
@@ -552,7 +556,7 @@ void Graph::updateMinMerges(vector<tuple<int, int>>* minMerges, unsigned int ver
         }
 
         // add all second degree neighbours
-        for (auto it2 = adjLists[edgeValue(*it)-1]->begin(); it2 != adjLists[edgeValue(*it)-1]->end(); ++it2) {
+        for (auto it2 = adjLists[vertex-1]->begin(); it2 != adjLists[vertex-1]->end(); ++it2) {
             auto vertex2 = edgeValue(*it2);
             auto minMerge2 = (*minMerges)[vertex2-1];
             if (get<1>(minMerge2) == delVertex) {
