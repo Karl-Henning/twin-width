@@ -1,2 +1,15 @@
 .idea/
 cmake-build-debug/
+
+CMakeCache.txt
+CMakeFiles/
+Treewidth-PACE-2017-instances-master/
+__MACOSX/
+heuristic-public.zip
+heuristic-public/
+heuristic/
+main
+main_2023_public
+master.zip
+twin-width.log
+twin-width_2023_public.log

@@ -72,12 +72,28 @@ unsigned int newAlgo(Graph* graph) {
     // algorithm 1.0
 
     // graph->printSlim();
-
+cout << "init..." << endl;
     // store most optimal Merge for each vertex in array (redDeg after merge, merged with vertex)
     auto minMerges = vector<tuple<int, int>>(graph->getVertecies());
     for (unsigned int vertex1 = 1; vertex1 <= graph->getVertecies(); vertex1++) {
-        minMerges[vertex1-1] = graph->getOptimalMerge(vertex1);
+	auto start = std::chrono::high_resolution_clock::now();
+    minMerges[vertex1-1] = graph->getOptimalMerge(vertex1);
+    auto end = std::chrono::high_resolution_clock::now();
+
+    std::chrono::duration<double> elapsed = end - start;
+    auto duration = elapsed.count();
+
+    if (duration * 1000 < 1000) {
+        cout << "duration: " << duration*1000 << "ms" << endl;
+    } else if (duration/60 < 1) {
+        cout << "duration: " << duration << "s" << endl;
+    } else if (duration/60) {
+        cout << "duration: " << duration/60 << "m" << endl;
     }
+
+    }
+
+    cout << "done with init" << endl;
 
     // merge vertices with lowest redDeg
     for(unsigned int iteration = 1; iteration < graph->getVertecies(); iteration++) {
@@ -173,8 +189,8 @@ void predefinedMerges(string fileName) {
 int main() {
     // vector<int> sol = {1, 2, 0, 0, 3, 0, 2, 4, 1, 2};
     // double average0 = 0;
-    string naming = "heuristic/he";
-    for(int i = 1; i < 201; i++) {
+    string naming = "heuristic-public/heuristic_"; // "heuristic/he";
+    for(int i = 2; i <= 20; i += 2) {
         string fileName;
         if(i < 10)
             fileName = naming + "00";

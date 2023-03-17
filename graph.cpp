@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <climits>
 #include <tuple>
+#include <chrono>
 
 Graph::Graph(unsigned int V) {
     if (V > INT_MAX){
@@ -569,7 +570,10 @@ void Graph::updateMinMerges(vector<tuple<int, int>>* minMerges, unsigned int ver
 
     // update all vertecies in allNeighbours
     for (auto it = allNeighbours.begin(); it != allNeighbours.end(); ++it) {
+auto start = std::chrono::high_resolution_clock::now();
         (*minMerges)[*it-1] = getOptimalMerge(*it);
+auto end = std::chrono::high_resolution_clock::now();
+cout << "time:" << ((end-start).count() * 1000) << "ms" << endl;
     }
 }
 
