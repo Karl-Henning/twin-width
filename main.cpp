@@ -72,13 +72,13 @@ unsigned int newAlgo(Graph* graph) {
     // algorithm 1.0
 
     // graph->printSlim();
-cout << "init..." << endl;
+// cout << "init..." << endl;
     // store most optimal Merge for each vertex in array (redDeg after merge, merged with vertex)
     auto minMerges = vector<tuple<int, int>>(graph->getVertecies());
     for (unsigned int vertex1 = 1; vertex1 <= graph->getVertecies(); vertex1++) {
-	auto start = std::chrono::high_resolution_clock::now();
+//	auto start = std::chrono::high_resolution_clock::now();
     minMerges[vertex1-1] = graph->getOptimalMerge(vertex1);
-    auto end = std::chrono::high_resolution_clock::now();
+/*    auto end = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<double> elapsed = end - start;
     auto duration = elapsed.count();
@@ -90,10 +90,10 @@ cout << "init..." << endl;
     } else if (duration/60) {
         cout << "duration: " << duration/60 << "m" << endl;
     }
-
+*/
     }
 
-    cout << "done with init" << endl;
+//    cout << "done with init" << endl;
 
     // merge vertices with lowest redDeg
     for(unsigned int iteration = 1; iteration < graph->getVertecies(); iteration++) {

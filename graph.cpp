@@ -514,7 +514,7 @@ tuple<int, int> Graph::getOptimalMerge(unsigned int vertex) {
         // add all first degree neighbours
         auto vertex = edgeValue(*it);
         allNeighbours.push_back(vertex);
-
+/*
         // add all second degree neighbours
         for (auto it2 = adjLists[vertex-1]->begin(); it2 != adjLists[vertex-1]->end(); ++it2) {
             if (edgeValue(*it2) == vertex) {
@@ -525,14 +525,15 @@ tuple<int, int> Graph::getOptimalMerge(unsigned int vertex) {
                 allNeighbours.push_back(vertex2);
             }
         }
-    }
+*/
+  }
 
     // get optimal merge
     tuple<int, int> optimalMerge = make_tuple(INT_MAX, 0);
 
     for (auto it = allNeighbours.begin(); it != allNeighbours.end(); ++it) {
         int redDeg = theoreticalMergeVertices(vertex, *it);
-        if (redDeg == 0) {
+        if (redDeg == maxRedDeg) {
             return make_tuple(redDeg, *it);
         } else if (redDeg < get<0>(optimalMerge)) {
             optimalMerge = make_tuple(redDeg, *it);
@@ -566,14 +567,14 @@ void Graph::updateMinMerges(vector<tuple<int, int>>* minMerges, unsigned int ver
                 }
             }
         }
-    }
+  }
 
     // update all vertecies in allNeighbours
     for (auto it = allNeighbours.begin(); it != allNeighbours.end(); ++it) {
-auto start = std::chrono::high_resolution_clock::now();
+// auto start = std::chrono::high_resolution_clock::now();
         (*minMerges)[*it-1] = getOptimalMerge(*it);
-auto end = std::chrono::high_resolution_clock::now();
-cout << "time:" << ((end-start).count() * 1000) << "ms" << endl;
+// auto end = std::chrono::high_resolution_clock::now();
+// cout << "time:" << ((end-start).count() * 1000) << "ms" << endl;
     }
 }
 
