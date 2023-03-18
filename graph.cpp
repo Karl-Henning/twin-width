@@ -512,20 +512,20 @@ tuple<int, int> Graph::getOptimalMerge(unsigned int vertex) {
     vector<unsigned int> allNeighbours;
     for (auto it = adjLists[vertex-1]->begin(); it != adjLists[vertex-1]->end(); ++it) {
         // add all first degree neighbours
-        auto vertex = edgeValue(*it);
-        allNeighbours.push_back(vertex);
-/*
+        auto target1 = edgeValue(*it);
+        allNeighbours.push_back(target1);
+
         // add all second degree neighbours
-        for (auto it2 = adjLists[vertex-1]->begin(); it2 != adjLists[vertex-1]->end(); ++it2) {
+        for (auto it2 = adjLists[target1-1]->begin(); it2 != adjLists[target1-1]->end(); ++it2) {
             if (edgeValue(*it2) == vertex) {
                 continue;
             }
-            auto vertex2 = edgeValue(*it2);
-            if (find(allNeighbours.begin(), allNeighbours.end(), vertex2) == allNeighbours.end()) {
-                allNeighbours.push_back(vertex2);
+            auto target2 = edgeValue(*it2);
+            if (find(allNeighbours.begin(), allNeighbours.end(), target2) == allNeighbours.end()) {
+                allNeighbours.push_back(target2);
             }
         }
-*/
+
   }
 
     // get optimal merge
