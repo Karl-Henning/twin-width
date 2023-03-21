@@ -5,8 +5,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
+
+# list of logfiles for which graphs are to be generated  (that are converted into txt files) 
 names = ["log","twin-width_greedy","twin-width_newAlgo_2017_001-100","twin-width_newAlgo_2017_001-151"]
 for name in names:
+  #open the log file and extract all the information given 
   with open(name+".txt") as f:
     lines = f.readlines()
     b=[None]*len(lines)
@@ -28,9 +31,13 @@ for name in names:
         lines[i-1] = ''.join(x for x in lines[i-1] if x.isdigit() or x == "." or x == " " or x=="s" or x=="m") 
     for i in range(len(lines)-1):
       a = lines[i].split()
+      
+    # b and c are temprorary variables that store the time and twin width data 
       b[i] = a[0]
       c[i] = a[1]
       time_in_s = [None]*(len(lines)-1)
+
+    #convert the runt time information into time in seconds 
     for i in range(len(b)-1):
         if  b[i].endswith("ms"):
           b[i]= b[i][:-2]
@@ -55,7 +62,6 @@ for name in names:
     edges =[7, 172, 167, 172, 13, 111, 303, 332, 452, 82, 900, 921, 988, 739, 916, 790, 840, 762, 926, 849, 717, 735, 1149, 773, 742, 725, 1024, 786, 1069, 661, 630, 676, 614, 836, 714, 817, 1003, 604, 603, 196, 307, 179, 299, 125, 199, 340, 239, 363, 95, 192, 751, 193, 378, 51, 100, 112, 56, 112, 64, 56, 120, 126, 81, 68, 100, 121, 81, 112, 85, 85, 96, 144, 100, 121, 100, 90, 42, 125, 125, 50, 102, 56, 49, 2113, 1751, 1996, 1847, 2030, 1692, 1558, 1692, 1848, 1910, 1684, 1643, 1675, 1545, 708, 2835, 500, 10200, 823, 819, 1236, 1194, 4660, 2228, 1160, 1660, 1133, 400, 3228, 1952, 1178, 8749, 2200, 6040, 2200, 3745, 1266, 1962, 7343, 7900, 7420, 2200, 2200, 2200, 2200, 4575, 2257, 7833, 7565, 3952, 1995, 8282, 8591, 8905, 17307, 7865, 20103, 11680, 9600, 10531, 23695, 10420, 26328, 7502, 34033, 2856, 31473, 32188, 72835, 49282, 66421, 69371, 85646, 127574, 6220, 144314, 62914, 154188, 95695, 95078, 20446, 11304, 129128, 155352, 124208, 273548, 351267, 373241, 468913, 302023, 105424, 69789, 225885, 199998, 578891, 134176, 685591, 77639, 716109, 107436, 1484059, 258776, 259611, 381703, 106013, 1035685, 89315, 1292729, 178719, 109684, 2214260, 1312237, 1546096, 222845, 4732056, 8242420, 15531867]
     edges =np.array(edges[1:len(c)])
     area = 50
-    #plot graph that shows the correlation between time and vertices
     MYDIR = (name)
     CHECK_FOLDER = os.path.isdir(MYDIR)
 
@@ -69,6 +75,8 @@ for name in names:
     cwd =os.getcwd()
     os.chdir(cwd+"\\"+name)
     plt.rcParams["figure.figsize"]=(30 , 20)
+    
+    #plot graph that shows the correlation between time and vertices
     plt.scatter(time_in_s,vertices,s=area)
     plt.xlabel('time in s')
     plt.ylabel('vertices')
