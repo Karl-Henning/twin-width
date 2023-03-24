@@ -66,7 +66,7 @@ for name in names:
     density = edges[:] / vertices[:]
 
     area = 50
-    MYDIR = (name)
+    MYDIR = ("graphs\\"+name)
     CHECK_FOLDER = os.path.isdir(MYDIR)
 
 
@@ -77,7 +77,7 @@ for name in names:
     else:
       print(MYDIR, "folder already exists.")
     cwd =os.getcwd()
-    os.chdir(cwd+"\\"+name)
+    os.chdir(cwd+"\\graphs\\"+name)
     plt.rcParams["figure.figsize"]=(30 , 20)
     
     #plot graph that shows the correlation between time and vertices
@@ -113,7 +113,7 @@ for name in names:
     plt.ylabel('edges')
     plt.savefig(name+"_"+'twin-width_edges.png')
     plt.close() 
-    os.chdir(cwd)
+    
 
     plt.title(name)
     plt.rcParams["figure.figsize"]=(30 , 20)
