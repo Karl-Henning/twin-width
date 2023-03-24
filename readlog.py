@@ -4,7 +4,7 @@ import pandas
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-
+import math
 
 # list of logfiles for which graphs are to be generated  (that are converted into txt files) 
 names = ["log","twin-width_greedy","twin-width_newAlgo_2017_001-100","twin-width_newAlgo_2017_001-151"]
@@ -21,14 +21,16 @@ for name in names:
       if i < 10:
         lines[i-1]= lines[i-1].removeprefix('heuristic/he00'+str(i)+".gr, runtime: ")
         lines[i-1] = ''.join(x for x in lines[i-1] if x.isdigit() or x == "." or x == " " or x=="s" or x=="m")
-      
+        
 
       if i >= 10:
         lines[i-1]= lines[i-1].removeprefix('heuristic/he0'+str(i)+".gr, runtime: ")
         lines[i-1] = ''.join(x for x in lines[i-1] if x.isdigit() or x == "." or x == " " or x=="s" or x=="m") 
       if i >= 100:
         lines[i-1]= lines[i-1].removeprefix('heuristic/he'+str(i)+".gr, runtime: ")
-        lines[i-1] = ''.join(x for x in lines[i-1] if x.isdigit() or x == "." or x == " " or x=="s" or x=="m") 
+        lines[i-1] = ''.join(x for x in lines[i-1] if x.isdigit() or x == "." or x == " " or x=="s" or x=="m")
+        
+        lines[i-1]= lines[i-1].removeprefix("s"+str(i)+". m")
     for i in range(len(lines)-1):
       a = lines[i].split()
       
@@ -42,17 +44,17 @@ for name in names:
         if  b[i].endswith("ms"):
           b[i]= b[i][:-2]
           temp = float(b[i])/1000
-          time_in_s[i] = temp 
+          time_in_s[i] = math.log(temp) 
 
         elif b[i].endswith("s"):
           b[i]= b[i][:-1]
           temp = float(b[i])
-          time_in_s[i] = temp
+          time_in_s[i] = math.log(temp)
 
         elif b[i].endswith("m"):
           b[i]= b[i][:-1]
           temp = float(b[i])*60
-          time_in_s[i] = temp
+          time_in_s[i] = math.log(temp)
 
         else:
           time_in_s[i]= 0
@@ -80,7 +82,7 @@ for name in names:
     
     #plot graph that shows the correlation between time and vertices
     plt.scatter(time_in_s,vertices,s=area)
-    plt.xlabel('time in s')
+    plt.xlabel('time in log(s)')
     plt.ylabel('vertices')
     plt.savefig(name +""+name+"_"+'time_vertices.png')
     plt.close()
@@ -98,7 +100,7 @@ for name in names:
     plt.title(name)
     plt.rcParams["figure.figsize"]=(30 , 20)
     plt.scatter(time_in_s,edges,s=area)
-    plt.xlabel('time in s')
+    plt.xlabel('time in log(s)')
     plt.ylabel('edges')
     plt.savefig(name+"_"+'time_edges.png')
     plt.close()
@@ -116,7 +118,7 @@ for name in names:
     plt.title(name)
     plt.rcParams["figure.figsize"]=(30 , 20)
     plt.scatter(time_in_s, density ,s=area)
-    plt.xlabel('time in s')
+    plt.xlabel('time in log(s)')
     plt.ylabel('density')
     plt.savefig(name+"_"+'time_in_s_density.png')
     plt.close() 
