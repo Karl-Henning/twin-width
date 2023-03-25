@@ -37,6 +37,7 @@ for name in names:
     # b and c are temprorary variables that store the time and twin width data 
       b[i] = a[0]
       c[i] = a[1]
+      #TODO: the last value of c is always negative needs to be chnaged
       time_in_s = [None]*(len(lines)-1)
 
     #convert the runt time information into time in seconds 
@@ -114,12 +115,29 @@ for name in names:
     plt.savefig(name+"_"+'twin-width_edges.png')
     plt.close() 
     
-
+    
     plt.title(name)
     plt.rcParams["figure.figsize"]=(30 , 20)
-    plt.scatter(time_in_s, density ,s=area)
+    c_temp = [None]*len(c[:-1])
+    for k in range(len(c[:-1])):
+      if c[k] == None or c[k]=='0':
+        c_temp[k] = 0
+      else:
+        c_temp[k]=1 - 1/float(c[k])
+    plt.scatter(time_in_s, density, c=c_temp[:], cmap='Reds')
     plt.xlabel('time in log(s)')
     plt.ylabel('density')
-    plt.savefig(name+"_"+'time_in_s_density.png')
+    plt.colorbar(label="1/Twin Width", orientation="vertical")
+    plt.savefig(name+"_"+'time_in_s_density_colored.png')  
     plt.close() 
+    
+    plt.title(name)
+    plt.rcParams["figure.figsize"]=(30 , 20)
+    plt.scatter(time_in_s, density, c=c_temp[:], cmap='Reds')
+    plt.xlabel('time in log(s)')
+    plt.ylabel('density')
+    plt.savefig(name+"_"+'time_in_s_density.png')  
+    plt.close() 
+    
+
     os.chdir(cwd)
