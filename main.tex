@@ -120,20 +120,19 @@ graph. After an optimal merge is found, we perform the merge and repeat the proc
 only a single vertex remains.
 
 \subsection{Heuristic}
-To further optimize our algorithm, we added a heuristic which only considers merges of
+To further optimize our algorithm, we added a heuristic that only considers merges of
 first and second-degree neighbors. This heuristic is always optimal because vertices of
-degree greater than two will always result in a higher number of red edges.
+a degree greater than two will always result in a higher number of red edges.
 
 \subsection{Caching}
-To further optimize our algorithm, we added a caching mechanism which stores for every
+To further optimize our algorithm, we added a caching mechanism that stores for every
 vertex its optimal merge partner and the resulting maximal number of red edges in which
 the merge would result. This allows us to avoid recalculating the optimal merge for every
 vertex. This is especially useful for large graphs.
 
 \section{Example}
-In the following we will show our algorithm in action on a small graph. The vertices are
-labeled according to the following schema (index, optimal merge partner, resulting
-maximal number of red edges after merge). The optimal merge partner is the index of the
+In the following, we will show our algorithm in action on a small graph. The vertices are
+labeled according to the following schema (index, optimal merge partner, resulting in maximal number of red edges after merge). The optimal merge partner is the index of the
 vertex that should be merged with the current vertex. The maximal number of red edges is
 the number of red edges that would result from the merge. The colors of the edges
 indicate the following:
@@ -174,6 +173,11 @@ indicate the following:
 \includegraphics[width=0.5\textwidth]{images/merge23.png}
 \includegraphics[width=0.5\textwidth]{images/merge24.png}
 
+\section{Performance Improvements}
+In order to improve the performance of our algorithm, we modified the algorithm to only
+update all the vertices that wanted to merge with the deleted vertex after a merge was
+performed. This increased the performance of our algorithm drastically however, it
+therefore also lead to a worse twin-width upper bound.
 \section{Results}
 We have tested our algorithm on a variety of graphs.
 
