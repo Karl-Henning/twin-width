@@ -67,7 +67,7 @@ for name in names:
     density = vertices[:]/edges[:] 
 
     area = 50
-    plt.rcParams["figure.figsize"]=(30 , 20)
+    plt.rcParams["figure.figsize"]=(15 , 10)
     
     #plot graph that shows the correlation between time and vertices
     plt.scatter(time_in_s,density,s=area, label=name)
