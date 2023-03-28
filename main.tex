@@ -38,9 +38,9 @@ Finally, we will discuss the implications of our results and identify any limita
 %unnötige introduction .. \\
 
 
-In the course of the seminar Algorithm Engineering we participate in the \todo{https://pacechallenge.org/2023/}{PACE Challenge 2023}}. This years
+In the course of the seminar Algorithm Engineering we participate in the \todo{https://pacechallenge.org/2023/} PACE Challenge 2023. This years
 Challenge is about twin-width, a graph parameter that measures the distance of a graph to
-a co-graph. Introduced in 2020 The parameter did lead to many theoretical results but as
+a cograph. Introduced in 2020 The parameter did lead to many theoretical results but as
 of now its not real practical tested. \todo{https://ieeexplore.ieee.org/document/9317878 + quellen für results einbinden} The goal of this paper is to implement and test it to bridge
 the gap between theory and practice.\\ The twin-width algorithm is an new approach to
 solve graph theory problems that are commonly solved by the tree-width algorithm. The
@@ -56,9 +56,9 @@ Basically it's a non-negative integer measuring a graphs distance to being a cog
 cograph is described by the following properties:
 
 \begin{enumerate}
-	\item K1 is a cograph.
-	\item If G is a cograph the complement of G is also a cograph.
-	\item If G and U are cographs their disjoint union is also a cograph.
+	\item $K1$ is a cograph.
+	\item If $G$ is a cograph the complement of $G$ is also a cograph.
+	\item If $G$ and $U$ are cographs their disjoint union is also a cograph.
 \end{enumerate}
 
 This implies that you can find two twins in every cograph, that you can contract together
@@ -70,15 +70,15 @@ bounded number of elements). We actually track the errors and call the edges we 
 add "red edges".
 
 A graph has now twin-width d if we can bound the degree in red edges by the treshhold d.
-Because cographs don't produce errors they always have twin-width 0. \\
+Because cographs do not produce errors they always have twin-width $0$. \\
 %Add grapic example
 
-graphs that can be reduced to a single vertex by a process of repeatedly finding any two
+Graphs that can be reduced to a single vertex by a process of repeatedly finding any two
 twin vertices and merging them into a single vertex. The definition of twin-width mimics
 this reduction process. there are false and true twins.
 
-true twins have the same set of edges A = B false twins have a similar set of edges the
-edges that differ will be marked red {A / B \& B/A} == red
+True twins have the same set of edges $A = B$ false twins have a similar set of edges the
+edges that differ will be marked red ${A / B \& B/A} ==$ red
 
 the twin width is the variable that sets the maximum of red edges that appear by a
 reduction of a graph G. This variable can be used to upper-bound the complexity for
