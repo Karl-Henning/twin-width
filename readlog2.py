@@ -7,7 +7,7 @@ import os
 import math
 
 # list of logfiles for which graphs are to be generated  (that are converted into txt files) 
-names = ["log","twin-width_greedy","twin-width_newAlgo_2017_001-100","twin-width_newAlgo_2017_001-151"]
+names = ["log","twin-width_greedy","twin-width_newAlgo_2017_001-100"]
 for name in names:
   #open the log file and extract all the information given 
   with open(name+".txt") as f:
@@ -67,77 +67,14 @@ for name in names:
     density = edges[:] / vertices[:]
 
     area = 50
-    MYDIR = ("graphs\\"+name)
-    CHECK_FOLDER = os.path.isdir(MYDIR)
-
-
-    if not CHECK_FOLDER:
-      os.makedirs(MYDIR)
-      print("created folder : ", MYDIR)
-
-    else:
-      print(MYDIR, "folder already exists.")
-    cwd =os.getcwd()
-    os.chdir(cwd+"\\graphs\\"+name)
     plt.rcParams["figure.figsize"]=(30 , 20)
     
     #plot graph that shows the correlation between time and vertices
-    plt.scatter(time_in_s,vertices,s=area)
-    plt.xlabel('time in log(s)')
-    plt.ylabel('vertices')
-    plt.savefig(name +""+name+"_"+'time_vertices.png')
-    plt.close()
-
-    #plot graph that shows the correlation between twin width and vertices
-    plt.title(name)
-    plt.rcParams["figure.figsize"]=(30 , 20)
-    plt.scatter(c[:-1],vertices,s=area)
-    plt.xlabel('twin width')
-    plt.ylabel('vertices')
-    plt.savefig(name+"_"+'twin-width_vertices.png')
-    plt.close()
-
-    #plot graph that shows the correlation between time and edges
-    plt.title(name)
-    plt.rcParams["figure.figsize"]=(30 , 20)
-    plt.scatter(time_in_s,edges,s=area)
-    plt.xlabel('time in log(s)')
+    plt.scatter(c[:-1],edges,s=area, label=name)
+    plt.legend()
+    plt.xlabel('twin_width')
     plt.ylabel('edges')
-    plt.savefig(name+"_"+'time_edges.png')
-    plt.close()
-
-    #plot graph that shows the correlation between twin width and edges
-    plt.title(name)
-    plt.rcParams["figure.figsize"]=(30 , 20)
-    plt.scatter(c[:-1],edges,s=area)
-    plt.xlabel('twin width')
-    plt.ylabel('edges')
-    plt.savefig(name+"_"+'twin-width_edges.png')
-    plt.close() 
+    plt.savefig('twinwidth_edges.png')
     
-    
-    plt.title(name)
-    plt.rcParams["figure.figsize"]=(30 , 20)
-    c_temp = [None]*len(c[:-1])
-    for k in range(len(c[:-1])):
-      if c[k] == None or c[k]== 0 :
-        c_temp[k] = 0
-      else:
-        c_temp[k]=1 - 1/float(c[k])
-    plt.scatter(time_in_s, density, c=c_temp[:], cmap='Reds')
-    plt.xlabel('time in log(s)')
-    plt.ylabel('density')
-    plt.colorbar(label="1/Twin Width", orientation="vertical")
-    plt.savefig(name+"_"+'time_in_s_density_colored.png')  
-    plt.close() 
-    
-    plt.title(name)
-    plt.rcParams["figure.figsize"]=(30 , 20)
-    plt.scatter(time_in_s, density, c=c_temp[:], cmap='Reds')
-    plt.xlabel('time in log(s)')
-    plt.ylabel('density')
-    plt.savefig(name+"_"+'time_in_s_density.png')  
-    plt.close() 
-    
-
-    os.chdir(cwd)
+    plt.grid(True)
+plt.close()
