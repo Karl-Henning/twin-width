@@ -36,18 +36,18 @@ Finally, we will discuss the implications of our results and identify any limita
 %unnötige introduction .. \\
 
 
-In the course of the seminar Algorithm Engineering we participate in the PACE Challenge 2023.\cite{PACE} This years
+In the course of the seminar Algorithm Engineering, we participate in the PACE Challenge 2023.\cite{PACE} This years
 Challenge is about twin-width, a graph parameter that measures the distance of a graph to
 a cograph. Introduced in 2020 The parameter lead to many theoretical results but as
-of now it is not real practical tested. \cite{Bonnet2020,Hlineny2022,Jacob2022} So our goal is to implement and test it to bridge
+of now, it is not practically tested. \cite{Bonnet2020,Hlineny2022,Jacob2022} So our goal is to implement and test it to bridge
 the gap between theory and practice.\\ The twin-width algorithm is a new approach to
-solve graph theory problems that are commonly solved by the tree-width algorithm. The
-starting point of our paper will be a short summary of the algorithm. Afterwards we will
+solving graph theory problems that are commonly solved by the tree-width algorithm. The
+starting point of our paper will be a short summary of the algorithm. Afterward we will
 introduce a way to implement it in C++ and present how it performs on a test set of graphs.
 %Beschreibung...
 
 \section{Twin Width}
-The twin-width of a graph is an indicator for its complexity and studies how efficient
+The twin-width of a graph is an indicator of its complexity and studies how efficiently
 different algorithms will perform.\\
 It is a non-negative integer measuring a graph's distance to being a cograph. A
 cograph is described by the following properties:
@@ -64,7 +64,7 @@ Now the idea is that a graph has bounded twin-width if we can contract it to a s
 by contracting near-twins together (two vertices whose neighborhoods differ only on a
 bounded number of elements). We track the errors and call the edges we need to
 add "red edges".\\
-A graph has twin-width $d$ if we can bound the degree in red edges by the treshhold $d$.
+A graph has twin-width $d$ if we can bound the degree in red edges by the treshold $d$.
 Because cographs do not produce errors they always have twin-width $0$. \\
 %Add grapic example
 
@@ -73,7 +73,7 @@ twin vertices and merging them into a single vertex. The definition of twin-widt
 this reduction process. There are false and true twins.\\
 True twins have the same set of edges $A = B$. False twins have a similar set of edges. The
 edges that differ will be marked red ${A / B \& B/A} ==$ red\\
-The twin width of a graph $G$ is the variable that sets the maximum of red edges occuring in a
+The twin width of a graph $G$ is the variable that sets the maximum of red edges occurring in a
 reduction of $G$. This variable can be used to upper-bound the complexity for
 certain algorithms from NP-Complexity to Polynomial Complexity. citations:
 \cite{bonnet2021twini} \cite{bonnet2021twinii}.
@@ -128,20 +128,19 @@ graph. After an optimal merge is found, we perform the merge and repeat the proc
 only a single vertex remains.
 
 \subsection{Heuristic}
-To further optimize our algorithm, we added a heuristic which only considers merges of
-first and second-degree neighbors. This heuristic is always optimal because vertecies of
-degree greater than two will always result in a higher number of red edges.
+To further optimize our algorithm, we added a heuristic that only considers merges of
+first and second-degree neighbors. This heuristic is always optimal because vertices of
+a degree greater than two will always result in a higher number of red edges.
 
 \subsection{Caching}
-To further optimize our algorithm, we added a caching mechanism which stores for every
+To further optimize our algorithm, we added a caching mechanism that stores for every
 vertex its optimal merge partner and the resulting maximal number of red edges in which
 the merge would result. This allows us to avoid recalculating the optimal merge for every
 vertex. This is especially useful for large graphs.
 
 \section{Example}
-In the following we will show our algorithm in action on a small graph. The vertices are
-labeled according to the following schema (index, optimal merge partner, resulting
-maximal number of red edges after merge). The optimal merge partner is the index of the
+In the following, we will show our algorithm in action on a small graph. The vertices are
+labeled according to the following schema (index, optimal merge partner, resulting in maximal number of red edges after merge). The optimal merge partner is the index of the
 vertex that should be merged with the current vertex. The maximal number of red edges is
 the number of red edges that would result from the merge. The colors of the edges
 indicate the following:
@@ -183,10 +182,10 @@ indicate the following:
 \includegraphics[width=0.5\textwidth]{images/merge24.png}
 
 \section{Performance Improvements}
-Inorder to improve the performance of our algorithm, we modified the algorithm to only
-update all the vertecies that wanted to merge with the deleted vertex after a merge was
+In order to improve the performance of our algorithm, we modified the algorithm to only
+update all the vertices that wanted to merge with the deleted vertex after a merge was
 performed. This increased the performance of our algorithm drastically however, it
-therefore also lead to a worde twin-width upper bound.
+therefore also lead to a worse twin-width upper bound.
 \section{Results}
 We have tested our algorithm on a variety of graphs.
 
