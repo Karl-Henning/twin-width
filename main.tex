@@ -30,27 +30,21 @@
 This paper examines the graph parameter twin-width and introduces an implementation based on the greedy algorithm.\\
 Within this work, we propose an implementation in C++ of an heuristic algorithm that calculates the twin-width of a graph, along with a testing framework to evaluate its performance on various graph datasets. We will start by describing the algorithm and our implementation in detail.\\
 Furthermore we will show our results to evaluate its performance on several large graph datasets. These datasets will include both randomly generated graphs and real-world graphs.\\
-Finally, we will discuss the implications of our results and identify any limitations or areas for future research and demonstrate its potential as a useful tool for solving graph theory problems.
+Finally, we will discuss the implications of our results and identify any limitations or areas for future research and demonstrate its potential as a useful tool for solving graph theory problems.\\ \\
+Our implementation is available at https://github.com/Karl-Henning/twin-width.
 
 \section{Introduction}
 %unnötige introduction .. \\
 
 
-In the course of the seminar Algorithm Engineering we participate in the PACE Challenge 2023.\cite{PACE} This years
-Challenge is about twin-width, a graph parameter that measures the distance of a graph to
-a cograph. Introduced in 2020 The parameter lead to many theoretical results but as
-of now it is not real practical tested. \cite{Bonnet2020,Hlineny2022,Jacob2022} So our goal is to implement and test it to bridge
-the gap between theory and practice.\\ The twin-width algorithm is a new approach to
-solve graph theory problems that are commonly solved by the tree-width algorithm. The
-starting point of our paper will be a short summary of the algorithm. Afterwards we will
-introduce a way to implement it in C++ and present how it performs on a test set of graphs.
+In the course of the seminar Algorithm Engineering at Technische Universität Hamburg (TUHH) we participate in the PACE Challenge 2023.\cite{PACE} This year's challenge is about twin-width, a graph parameter that measures the distance of a graph to a cograph. Introduced in 2020 the parameter lead to many theoretical results, but as
+of now there is no known actual implementation available \cite{Bonnet2020,Hlineny2022,Jacob2022}. So our goal is to implement and test it to bridge the gap between theory and practice.\\ The twin-width algorithm is a new approach to
+solve graph theory problems that are commonly solved by the tree-width algorithm. Firstly, we will give a short explanation of the algorithm. Afterwards we will introduce a way to implement it in C++ and present how it performs on a test set of graphs.
 %Beschreibung...
 
 \section{Twin Width}
-The twin-width of a graph is an indicator for its complexity and studies how efficient
-different algorithms will perform.\\
-It is a non-negative integer measuring a graph's distance to being a cograph. A
-cograph is described by the following properties:
+The twin-width of a graph is an indicator for its complexity and studies how efficient different algorithms will perform.\\
+It is a non-negative integer measuring a graph's distance to being a cograph. A cograph is described by the following properties:
 
 \begin{enumerate}
 	\item $K1$ is a cograph.
@@ -58,13 +52,12 @@ cograph is described by the following properties:
 	\item If $G$ and $U$ are cographs their disjoint union is also a cograph.
 \end{enumerate}
 
-This implies that you can find two twins in every cograph, that you can contract together
-and iterate the process until you have only a singleton left.\\
-Now the idea is that a graph has bounded twin-width if we can contract it to a singleton
+This implies that you can find two twins in every cograph which you can contract together. You can iterate the process until you have only a singleton left.\\
+We base the algorithm on the concept that a graph has bounded twin-width if we can contract it to a singleton
 by contracting near-twins together (two vertices whose neighborhoods differ only on a
 bounded number of elements). We track the errors and call the edges we need to
 add "red edges".\\
-A graph has twin-width $d$ if we can bound the degree in red edges by the treshhold $d$.
+A graph has twin-width $d$ if we can bound the degree in red edges by the threshold $d$.
 Because cographs do not produce errors they always have twin-width $0$. \\
 %Add grapic example
 
@@ -73,10 +66,9 @@ twin vertices and merging them into a single vertex. The definition of twin-widt
 this reduction process. There are false and true twins.\\
 True twins have the same set of edges $A = B$. False twins have a similar set of edges. The
 edges that differ will be marked red ${A / B \& B/A} ==$ red\\
-The twin width of a graph $G$ is the variable that sets the maximum of red edges occuring in a
+The twin width of a graph $G$ is the variable that sets the maximum of red edges occurring in a
 reduction of $G$. This variable can be used to upper-bound the complexity for
-certain algorithms from NP-Complexity to Polynomial Complexity. citations:
-\cite{bonnet2021twini} \cite{bonnet2021twinii}.
+certain algorithms from NP-Complexity to Polynomial Complexity. \cite{bonnet2021twini} \cite{bonnet2021twinii}.
 
 \section{Algorithm}
 
@@ -114,7 +106,7 @@ certain algorithms from NP-Complexity to Polynomial Complexity. citations:
         \EndIf
         \State perform merge
         \State $minMerges[optimalMerge.del] \gets (redDeg = \infty)$
-        \State update $target$ and its first, second and third degree neighbours
+        \State update $target$ and its first, second and third degree neighbors
         \EndFor
     \end{algorithmic}
 \end{algorithm}
@@ -129,7 +121,7 @@ only a single vertex remains.
 
 \subsection{Heuristic}
 To further optimize our algorithm, we added a heuristic which only considers merges of
-first and second-degree neighbors. This heuristic is always optimal because vertecies of
+first and second-degree neighbors. This heuristic is always optimal because vertices of
 degree greater than two will always result in a higher number of red edges.
 
 \subsection{Caching}
