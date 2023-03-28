@@ -11,7 +11,7 @@
 \usepackage{algpseudocode}
 
 \usepackage{url}
-\usepackage{todonotes}
+\usepackage[disable]{todonotes}
 
 
 \date{February 2023}
@@ -27,12 +27,9 @@
 \maketitle\todo{zu lang}
 \section{Abstract}
 
-This paper examines the graph parameter twin-width and introduces an implementation based on the greedy algorithm.
-
-Within this work, we propose an implementation in C++ of an heuristic algorithm that calculates the twin-width of a graph, along with a testing framework to evaluate its performance on various graph datasets. We will start by describing the algorithm and our implementation in detail.
-
-Furthermore we will show our results to evaluate its performance on several large graph datasets. These datasets will include both randomly generated graphs and real-world graphs.
-
+This paper examines the graph parameter twin-width and introduces an implementation based on the greedy algorithm.\\
+Within this work, we propose an implementation in C++ of an heuristic algorithm that calculates the twin-width of a graph, along with a testing framework to evaluate its performance on various graph datasets. We will start by describing the algorithm and our implementation in detail.\\
+Furthermore we will show our results to evaluate its performance on several large graph datasets. These datasets will include both randomly generated graphs and real-world graphs.\\
 Finally, we will discuss the implications of our results and identify any limitations or areas for future research and demonstrate its potential as a useful tool for solving graph theory problems.
 
 \section{Introduction}
@@ -41,9 +38,9 @@ Finally, we will discuss the implications of our results and identify any limita
 
 In the course of the seminar Algorithm Engineering we participate in the PACE Challenge 2023.\cite{PACE} This years
 Challenge is about twin-width, a graph parameter that measures the distance of a graph to
-a cograph. Introduced in 2020 The parameter did lead to many theoretical results but as
-of now its not real practical tested. \cite{Bonnet2020,Hlineny2022,Jacob2022} The goal of this paper is to implement and test it to bridge
-the gap between theory and practice.\\ The twin-width algorithm is an new approach to
+a cograph. Introduced in 2020 The parameter lead to many theoretical results but as
+of now it is not real practical tested. \cite{Bonnet2020,Hlineny2022,Jacob2022} So our goal is to implement and test it to bridge
+the gap between theory and practice.\\ The twin-width algorithm is a new approach to
 solve graph theory problems that are commonly solved by the tree-width algorithm. The
 starting point of our paper will be a short summary of the algorithm. Afterwards we will
 introduce a way to implement it in C++ and present how it performs on a test set of graphs.
@@ -51,9 +48,8 @@ introduce a way to implement it in C++ and present how it performs on a test set
 
 \section{Twin Width}
 The twin-width of a graph is an indicator for its complexity and studies how efficient
-different algorithms will perform.
-
-Basically it's a non-negative integer measuring a graphs distance to being a cograph. A
+different algorithms will perform.\\
+It is a non-negative integer measuring a graph's distance to being a cograph. A
 cograph is described by the following properties:
 
 \begin{enumerate}
@@ -63,26 +59,22 @@ cograph is described by the following properties:
 \end{enumerate}
 
 This implies that you can find two twins in every cograph, that you can contract together
-and iterate the process until you have only a singleton left.
-
+and iterate the process until you have only a singleton left.\\
 Now the idea is that a graph has bounded twin-width if we can contract it to a singleton
 by contracting near-twins together (two vertices whose neighborhoods differ only on a
-bounded number of elements). We actually track the errors and call the edges we need to
-add "red edges".
-
-A graph has now twin-width d if we can bound the degree in red edges by the treshhold d.
+bounded number of elements). We track the errors and call the edges we need to
+add "red edges".\\
+A graph has twin-width $d$ if we can bound the degree in red edges by the treshhold $d$.
 Because cographs do not produce errors they always have twin-width $0$. \\
 %Add grapic example
 
-Graphs that can be reduced to a single vertex by a process of repeatedly finding any two
+Graphs can be reduced to a single vertex by a process of repeatedly finding any two
 twin vertices and merging them into a single vertex. The definition of twin-width mimics
-this reduction process. there are false and true twins.
-
-True twins have the same set of edges $A = B$ false twins have a similar set of edges the
-edges that differ will be marked red ${A / B \& B/A} ==$ red
-
-the twin width is the variable that sets the maximum of red edges that appear by a
-reduction of a graph G. This variable can be used to upper-bound the complexity for
+this reduction process. There are false and true twins.\\
+True twins have the same set of edges $A = B$. False twins have a similar set of edges. The
+edges that differ will be marked red ${A / B \& B/A} ==$ red\\
+The twin width of a graph $G$ is the variable that sets the maximum of red edges occuring in a
+reduction of $G$. This variable can be used to upper-bound the complexity for
 certain algorithms from NP-Complexity to Polynomial Complexity. citations:
 \cite{bonnet2021twini} \cite{bonnet2021twinii}.
 
