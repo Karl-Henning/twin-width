@@ -10,64 +10,65 @@
 \usepackage{algorithmicx}
 \usepackage{algpseudocode}
 
+\usepackage{todonotes}
+
+
 \date{February 2023}
 % create title
 \title{PACE Challenge 2023 - Twin-width}
 \author{
-    Constantin Duske, Karl Henning, Johann Strunck\\
-    email: \texttt{\{constantin.duske, karl.henning, johann.strunck\}@tuhh.de}
+    Karl Henning, Johann Strunck, Constantin Duske, Marcel Bode\\
+    email: \texttt{\{karl.henning, johann.strunck, constantin.duske, marcel.bode\}@tuhh.de}
 }
 
 \begin{document}
 
-\maketitle
+\maketitle\todo{zu lang}
+\section{Abstract}
+
+This Paper examines the grapf parameter twin-width and introduces an implementation based on the greedy algorithm.
+
+This paper will aim to provide an implementation in C++ of an heuristic algorithm that calculates the twin-width of a graph, along with a testing framework to evaluate its performance on various graph datasets. We will start by describing the algorithm and our implementation in detail.
+
+Furthermore we will show our results to evaluate its performance on several large graph datasets. These datasets will include both randomly generated graphs and real-world graphs.
+
+Finally, we will discuss the implications of our results and identify any limitations or areas for future research and demonstrate its potential as a useful tool for solving graph theory problems.
 
 \section{Introduction}
 %unnötige introduction .. \\
 
-In the course of this seminar we participate in the PACE Challenge 2023. This years
+In the course of this paper we participate in the PACE Challenge 2023. This year's
 Challenge is about twin-width, a graph parameter that measures the distance of a graph to
-a co-graph. Introduced in 2020 The parameter did lead to many theoretical results but as
-of now its not real practical tested. So Our goal is to implement and test it to bridge
-the gap between theory and practice. \\ The twin-width algorithm is an new approach to
-solve graph theory problems that are commonly solved by the tree-width algorithm. The
-starting point of our paper will be a short summary of the algorithm. Afterwards we will
-introduce a way to implement it in C++.%add reference to https://pacechallenge.org/2023/
+a co-graph. Introduced in 2020, the research about this parameter lead to many theoretical results but as of now it is not real practical tested. \todo{https://ieeexplore.ieee.org/document/9317878 + quellen für results einbinden} So our goal is to implement and test it to bridge the gap between theory and practice. \\ 
+The twin-width algorithm is a new approach to solve graph theory problems that are commonly solved by the tree-width algorithm. The starting point of our paper will be a short summary of the algorithm. Afterwards we will introduce a way to implement it in C++. \\%add reference to https://pacechallenge.org/2023/
 %Beschreibung...
 
-The twin-width of a graph is an indicator for its complexity and studies how efficient
-different algorithms will perform.
-
-Basically it's a non-negative integer measuring a graphs distance to being a Cograph. A
-Cograph is described by the following properties:
+Twin-with is a non-negative integer measuring a graph's distance to being a co-graph. A
+co-graph is described by the following properties: \todo{axioms?}
 
 \begin{enumerate}
-    \item K1 is a Cograph.
-    \item If G is a Cograph the complement of G is also a Cograph.
-    \item If G and U are Cographs their disjoint union is also a Cograph.
+    \item K1 is a co-graph.
+    \item If G is a co-graph the complement of G is also a co-graph.
+    \item If G and U are co-graphs, their disjoint union is also a co-graph.
 \end{enumerate}
 
-This implies that you can find two twins in every Cograph, that you can contract together
-and iterate the process until you have only a singleton left.
-
-Now the idea is that a graph has bounded twin-width if we can contract it to a singleton
+This implies that you can find two twins in every co-graph which you can contract together. Then you can iterate the process until you have only a singleton left.\\
+Now\todo{weg} the idea is that a graph has bounded twin-width if we can contract it to a singleton
 by contracting near-twins together (two vertices whose neighborhoods differ only on a
-bounded number of elements). We actually track the errors and call the edges we need to
-add "red edges".
-
-A graph has now twin-width d if we can bound the degree in red edges by the treshhold d.
-Because Cographs don't produce errors they always have twin-width 0. \\
+bounded number of elements). We actually\todo{weg} track the errors and call the edges we need to
+add "red edges".\\
+A graph has now\todo{weg} twin-width $d$ if we can bound the degree in red edges by the treshhold $d$.
+Because co-graphs don't produce errors they always have twin-width 0.\todo{Satzstellung drehen} \\
 %Add grapic example
 
 graphs that can be reduced to a single vertex by a process of repeatedly finding any two
-twin vertices and merging them into a single vertex. The definition of twin-width mimics
-this reduction process. there are false and true twins.
+twin vertices and merging them into a single vertex. \todo{Satz unvollständig} The definition of twin-width mimics
+this reduction process. There are false and true twins.\\
+True twins have the same set of edges $A = B$. False twins have a similar set of edges. The
+edges that differ will be marked red {A / B \& B/A} == red. \todo{Formel (?) hier komisch}\\
 
-true twins have the same set of edges A = B false twins have a similar set of edges the
-edges that differ will be marked red {A / B \& B/A} == red
-
-the twin width is the variable that sets the maximum of red edges that appear by a
-reduction of a graph G. This variable can be used to upper-bound the complexity for
+The twin width of a graph G is the variable that sets the maximum of red edges occuring in a
+reduction of G. This variable can be used to upper-bound the complexity for
 certain algorithms from NP-Complexity to Polynomial Complexity. citations:
 \cite{bonnet2021twini} \cite{bonnet2021twinii}.
 
@@ -132,7 +133,7 @@ the merge would result. This allows us to avoid recalculating the optimal merge 
 vertex. This is especially useful for large graphs.
 
 \section{Example}
-In the following we will show our algorithm in action on a small graph. The vertecies are
+In the following we will show our algorithm in action on a small graph. The vertices are
 labeled according to the following schema (index, optimal merge partner, resulting
 maximal number of red edges after merge). The optimal merge partner is the index of the
 vertex that should be merged with the current vertex. The maximal number of red edges is
