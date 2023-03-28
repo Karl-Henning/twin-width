@@ -79,7 +79,7 @@ for name in names:
       print(MYDIR, "folder already exists.")
     cwd =os.getcwd()
     os.chdir(cwd+"\\graphs\\"+name)
-    plt.rcParams["figure.figsize"]=(30 , 20)
+    plt.rcParams["figure.figsize"]=(8 , 6)
     
     #plot graph that shows the correlation between time and vertices
     plt.scatter(time_in_s,vertices,s=area)
