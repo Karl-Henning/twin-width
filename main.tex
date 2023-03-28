@@ -26,7 +26,7 @@
 \maketitle\todo{zu lang}
 \section{Abstract}
 
-This Paper examines the grapf parameter twin-width and introduces an implementation based on the greedy algorithm.
+This Paper examines the graph parameter twin-width and introduces an implementation based on the greedy algorithm.
 
 Within this work, we propose an implementation in C++ of an heuristic algorithm that calculates the twin-width of a graph, along with a testing framework to evaluate its performance on various graph datasets. We will start by describing the algorithm and our implementation in detail.
 
@@ -52,16 +52,16 @@ introduce a way to implement it in C++ and present how it performs on a test set
 The twin-width of a graph is an indicator for its complexity and studies how efficient
 different algorithms will perform.
 
-Basically it's a non-negative integer measuring a graphs distance to being a Cograph. A
-Cograph is described by the following properties:
+Basically it's a non-negative integer measuring a graphs distance to being a cograph. A
+cograph is described by the following properties:
 
 \begin{enumerate}
-	\item K1 is a Cograph.
-	\item If G is a Cograph the complement of G is also a Cograph.
-	\item If G and U are Cographs their disjoint union is also a Cograph.
+	\item K1 is a cograph.
+	\item If G is a cograph the complement of G is also a cograph.
+	\item If G and U are cographs their disjoint union is also a cograph.
 \end{enumerate}
 
-This implies that you can find two twins in every Cograph, that you can contract together
+This implies that you can find two twins in every cograph, that you can contract together
 and iterate the process until you have only a singleton left.
 
 Now the idea is that a graph has bounded twin-width if we can contract it to a singleton
@@ -70,7 +70,7 @@ bounded number of elements). We actually track the errors and call the edges we 
 add "red edges".
 
 A graph has now twin-width d if we can bound the degree in red edges by the treshhold d.
-Because Cographs don't produce errors they always have twin-width 0. \\
+Because cographs don't produce errors they always have twin-width 0. \\
 %Add grapic example
 
 graphs that can be reduced to a single vertex by a process of repeatedly finding any two
