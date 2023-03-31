@@ -3,4 +3,5 @@ project(twin_width)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(twin_width main.cpp)
+# Now simply link against gtest or gtest_main as needed. Eg
+add_executable(twin_width main.cpp graph.cpp graph.h)

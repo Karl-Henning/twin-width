@@ -1,2 +1,12 @@
 .idea/
 cmake-build-debug/
+
+CMakeCache.txt
+CMakeFiles/
+
+__MACOSX/
+.DS_Store
+
+data/
+*.zip
+*.log
